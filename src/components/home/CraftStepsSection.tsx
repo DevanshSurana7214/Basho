@@ -30,28 +30,29 @@ const steps = [
 
 const CraftStepsSection = () => {
   const containerRef = useRef(null);
+  const headerRef = useRef(null);
+  const isHeaderInView = useInView(headerRef, { once: true, margin: "-30%" });
 
   return (
     <section ref={containerRef} className="bg-charcoal relative">
-      {/* Section header */}
-      <div className="h-[50vh] flex items-center justify-center sticky top-0 z-0">
+      {/* Section header - cinematic fade in */}
+      <div ref={headerRef} className="h-[60vh] flex items-center justify-center sticky top-0 z-0">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-20%" }}
-          transition={{ duration: 1 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={isHeaderInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 1.5, ease: [0.25, 0.1, 0.25, 1] }}
           className="text-center px-8"
         >
-          <p className="text-xs tracking-[0.3em] uppercase text-cream/50 mb-6">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-cream/40 mb-8">
             The Process
           </p>
-          <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-cream">
+          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-cream font-light">
             From Earth to Art
           </h2>
         </motion.div>
       </div>
 
-      {/* Steps */}
+      {/* Steps - slow reveal with parallax */}
       {steps.map((step, index) => (
         <CraftStep key={step.title} step={step} index={index} isLast={index === steps.length - 1} />
       ))}
@@ -69,52 +70,52 @@ const CraftStep = ({
   isLast: boolean;
 }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, margin: "-30%" });
+  const isInView = useInView(ref, { once: false, margin: "-40%" });
   
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"]
   });
 
-  // Previous image dims when next enters
-  const imageOpacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.3, 1, 1, isLast ? 1 : 0.5]);
+  const imageOpacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.2, 1, 1, isLast ? 1 : 0.4]);
+  const imageY = useTransform(scrollYProgress, [0, 1], ["10%", "-10%"]);
 
   return (
     <div ref={ref} className="relative">
-      {/* Full-width image */}
       <motion.div
         className="relative h-screen"
         style={{ opacity: imageOpacity }}
       >
-        <img
+        <motion.img
           src={step.image}
           alt={step.title}
           className="w-full h-full object-cover"
+          style={{ y: imageY }}
         />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/40 to-charcoal/20" />
+        {/* Cinematic gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/30 to-charcoal/10" />
         
-        {/* Content overlay - fades in when in viewport */}
+        {/* Content - slow fade */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-          className="absolute inset-0 flex items-end pb-24 md:pb-32"
+          initial={{ opacity: 0, y: 50 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+          className="absolute inset-0 flex items-end pb-28 md:pb-36"
         >
-          <div className="container px-8 md:px-16">
-            <div className="max-w-2xl">
-              {/* Step number */}
-              <span className="font-serif text-7xl md:text-8xl text-cream/10 block mb-4">
+          <div className="container px-8 md:px-16 lg:px-24">
+            <div className="max-w-lg">
+              {/* Step number - very subtle */}
+              <span className="font-serif text-6xl md:text-7xl text-cream/[0.06] block mb-6">
                 {String(index + 1).padStart(2, '0')}
               </span>
               
-              {/* Title */}
-              <h3 className="font-serif text-4xl md:text-5xl text-cream mb-4">
+              {/* Title - caption style */}
+              <h3 className="font-serif text-2xl md:text-3xl text-cream font-light mb-4">
                 {step.title}
               </h3>
               
-              {/* Description - one line */}
-              <p className="font-sans text-cream/60 text-lg md:text-xl max-w-md">
+              {/* Description - small, understated */}
+              <p className="font-sans text-cream/50 text-sm md:text-base max-w-sm leading-relaxed">
                 {step.description}
               </p>
             </div>

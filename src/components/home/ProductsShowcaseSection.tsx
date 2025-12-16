@@ -1,4 +1,4 @@
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const ProductsShowcaseSection = () => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-10%" });
+  const isInView = useInView(ref, { once: true, margin: "-15%" });
 
   const { data: products } = useQuery({
     queryKey: ['featured-products-home'],
@@ -24,7 +24,7 @@ const ProductsShowcaseSection = () => {
   });
 
   return (
-    <section ref={ref} className="py-32 md:py-48 bg-background relative overflow-hidden">
+    <section ref={ref} className="py-40 md:py-56 bg-background relative overflow-hidden">
       {/* Grain overlay */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.02] mix-blend-overlay"
@@ -33,84 +33,112 @@ const ProductsShowcaseSection = () => {
         }}
       />
 
-      <div className="container px-8 md:px-12 lg:px-16">
-        {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 1 }}
-          className="mb-20 md:mb-28"
-        >
-          <p className="text-xs tracking-[0.3em] uppercase text-muted-foreground mb-6">
-            The Collection
-          </p>
-          <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground max-w-2xl">
-            Vessels for <span className="text-primary">Living</span>
-          </h2>
-        </motion.div>
-
-        {/* Editorial product layout - large images, small text, no pricing */}
-        <div className="space-y-24 md:space-y-32">
-          {products?.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 60 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ 
-                duration: 0.8, 
-                delay: 0.2 + (index * 0.2),
-                ease: [0.25, 0.1, 0.25, 1]
-              }}
-              className={`grid lg:grid-cols-2 gap-8 lg:gap-16 items-center ${
-                index % 2 === 1 ? 'lg:grid-flow-col-dense' : ''
-              }`}
-            >
-              {/* Large image */}
-              <div className={`relative aspect-[4/3] overflow-hidden ${
-                index % 2 === 1 ? 'lg:col-start-2' : ''
-              }`}>
-                <img
-                  src={product.image_url || '/placeholder.svg'}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Small text */}
-              <div className={`space-y-6 ${
-                index % 2 === 1 ? 'lg:col-start-1 lg:text-right' : ''
-              }`}>
-                <span className="font-serif text-6xl md:text-7xl text-foreground/10">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <h3 className="font-serif text-2xl md:text-3xl text-foreground">
-                  {product.name}
-                </h3>
-                <p className="font-sans text-muted-foreground text-base leading-relaxed max-w-md">
-                  {product.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* CTA button - appears last */}
+      <div className="container px-8 md:px-12 lg:px-24">
+        {/* Section header - cinematic fade */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 1.2 }}
-          className="mt-20 md:mt-28 text-center"
+          transition={{ duration: 1.5, ease: [0.25, 0.1, 0.25, 1] }}
+          className="mb-24 md:mb-32"
+        >
+          <p className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground/60 mb-8">
+            The Collection
+          </p>
+          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground font-light max-w-xl">
+            Vessels for Living
+          </h2>
+        </motion.div>
+
+        {/* Editorial product layout - large images, caption text */}
+        <div className="space-y-32 md:space-y-48">
+          {products?.map((product, index) => (
+            <ProductCard 
+              key={product.id} 
+              product={product} 
+              index={index}
+              isInView={isInView}
+            />
+          ))}
+        </div>
+
+        {/* CTA - subtle */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 1.2, delay: 1.5 }}
+          className="mt-32 md:mt-40 text-center"
         >
           <Link 
             to="/products"
-            className="inline-flex items-center gap-4 px-8 py-4 border border-foreground/20 text-foreground text-sm tracking-widest uppercase font-sans hover:bg-foreground hover:text-background transition-all duration-500 group"
+            className="inline-flex items-center gap-4 text-foreground/70 text-sm tracking-[0.2em] uppercase font-sans hover:text-foreground transition-colors duration-700 group"
           >
             View All Pieces
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-500" />
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-700" />
           </Link>
         </motion.div>
       </div>
     </section>
+  );
+};
+
+const ProductCard = ({ 
+  product, 
+  index, 
+  isInView 
+}: { 
+  product: any; 
+  index: number; 
+  isInView: boolean;
+}) => {
+  const cardRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start end", "end start"]
+  });
+
+  const imageY = useTransform(scrollYProgress, [0, 1], ["8%", "-8%"]);
+
+  return (
+    <motion.div
+      ref={cardRef}
+      initial={{ opacity: 0, y: 80 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ 
+        duration: 1.2, 
+        delay: 0.3 + (index * 0.25),
+        ease: [0.25, 0.1, 0.25, 1]
+      }}
+      className={`grid lg:grid-cols-12 gap-8 lg:gap-16 items-center ${
+        index % 2 === 1 ? 'lg:grid-flow-col-dense' : ''
+      }`}
+    >
+      {/* Large image with parallax */}
+      <div className={`relative aspect-[4/3] overflow-hidden lg:col-span-7 ${
+        index % 2 === 1 ? 'lg:col-start-6' : ''
+      }`}>
+        <motion.img
+          src={product.image_url || '/placeholder.svg'}
+          alt={product.name}
+          className="w-full h-[115%] object-cover"
+          style={{ y: imageY }}
+        />
+      </div>
+
+      {/* Caption text - small, understated */}
+      <div className={`lg:col-span-5 space-y-6 ${
+        index % 2 === 1 ? 'lg:col-start-1 lg:text-right lg:pr-8' : 'lg:pl-8'
+      }`}>
+        <span className="font-serif text-5xl md:text-6xl text-foreground/[0.06]">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <h3 className="font-serif text-xl md:text-2xl text-foreground font-light">
+          {product.name}
+        </h3>
+        <p className="font-sans text-muted-foreground/70 text-sm leading-relaxed max-w-sm">
+          {product.description}
+        </p>
+      </div>
+    </motion.div>
   );
 };
 

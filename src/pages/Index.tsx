@@ -15,7 +15,8 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
+    // Longer, more cinematic loading
+    const timer = setTimeout(() => setIsLoading(false), 1200);
     return () => clearTimeout(timer);
   }, []);
 
@@ -30,57 +31,33 @@ const Index = () => {
         <meta name="keywords" content="pottery, handcrafted tableware, Japanese pottery, wabi-sabi, ceramic workshops, Surat pottery, Gujarat pottery" />
       </Helmet>
 
-      {/* Bashō loading animation - only for homepage */}
+      {/* Cinematic loading - minimal, calm */}
       <AnimatePresence>
         {isLoading && (
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-            className="fixed inset-0 z-[200] flex items-center justify-center bg-paper"
+            transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-charcoal"
           >
             <div className="flex flex-col items-center">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05, y: -20 }}
-                transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-                className="relative"
+              {/* Simple, elegant brand mark */}
+              <motion.span 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+                className="font-serif text-3xl md:text-4xl text-cream/90 font-light tracking-wide"
               >
-                {/* Subtle glow */}
-                <motion.div
-                  animate={{ 
-                    scale: [1, 1.2, 1],
-                    opacity: [0.2, 0.4, 0.2]
-                  }}
-                  transition={{ 
-                    duration: 2.5, 
-                    repeat: Infinity, 
-                    ease: "easeInOut" 
-                  }}
-                  className="absolute inset-0 w-24 h-24 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 bg-primary/10 rounded-full blur-2xl"
-                />
-                
-                {/* Bashō text */}
-                <motion.span 
-                  className="font-serif text-4xl md:text-5xl text-foreground relative z-10 tracking-wide"
-                  animate={{ y: [0, -3, 0] }}
-                  transition={{ 
-                    duration: 3, 
-                    repeat: Infinity, 
-                    ease: "easeInOut" 
-                  }}
-                >
-                  Bashō
-                </motion.span>
-              </motion.div>
+                Bashō
+              </motion.span>
 
-              {/* Minimal loading line */}
+              {/* Subtle loading line */}
               <motion.div
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-                className="w-10 h-px bg-border mt-6 origin-left"
+                transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+                className="w-8 h-px bg-cream/20 mt-8 origin-left"
               />
             </div>
           </motion.div>

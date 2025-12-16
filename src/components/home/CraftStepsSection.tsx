@@ -62,7 +62,7 @@ const CraftStepsSection = () => {
 
   return (
     <section ref={sectionRef} className="bg-charcoal relative">
-      {/* Section header - also snaps */}
+      {/* Section header */}
       <div 
         ref={headerRef}
         className="snap-section h-screen flex items-center justify-center sticky top-0 z-0"
@@ -77,7 +77,7 @@ const CraftStepsSection = () => {
         </div>
       </div>
 
-      {/* Steps - each one snaps */}
+      {/* Steps - GSAP handles snapping at 30% visibility */}
       {steps.map((step, index) => (
         <CraftStep key={step.title} step={step} index={index} isLast={index === steps.length - 1} />
       ))}
@@ -102,6 +102,18 @@ const CraftStep = ({
     if (!stepRef.current) return;
 
     const ctx = gsap.context(() => {
+      // Snap trigger - when 30% of the image is visible, snap to full viewport
+      ScrollTrigger.create({
+        trigger: stepRef.current,
+        start: "top 70%", // 30% visible
+        end: "top top",
+        snap: {
+          snapTo: 1,
+          duration: { min: 0.4, max: 0.8 },
+          ease: "power2.inOut"
+        }
+      });
+
       // Image parallax - slower, more dramatic
       gsap.to(imageRef.current, {
         yPercent: -15,
@@ -179,7 +191,7 @@ const CraftStep = ({
   }, [isLast]);
 
   return (
-    <div ref={stepRef} className="snap-section relative h-screen">
+    <div ref={stepRef} className="relative h-screen">
       <div className="relative h-full overflow-hidden">
         <img
           ref={imageRef}

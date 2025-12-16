@@ -1,9 +1,14 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import handsImage from "@/assets/hero/hands-pottery-wheel.jpg";
+
+// Free pottery video from Pexels (direct CDN link)
+const HERO_VIDEO_URL = "https://videos.pexels.com/video-files/6975128/6975128-uhd_2560_1440_25fps.mp4";
 
 const ArrivalSection = () => {
   const ref = useRef(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"]
@@ -16,30 +21,33 @@ const ArrivalSection = () => {
 
   return (
     <section ref={ref} className="relative h-screen overflow-hidden">
-      {/* Full-screen video/image with subtle parallax */}
+      {/* Full-screen video with subtle parallax */}
       <motion.div 
         className="absolute inset-0"
         style={{ y: backgroundY, scale }}
       >
-        {/* Video background - using poster image as fallback */}
+        {/* Fallback image - shows while video loads */}
+        <img 
+          src={handsImage} 
+          alt="Hands shaping clay on pottery wheel" 
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+            videoLoaded ? 'opacity-0' : 'opacity-100'
+          }`}
+        />
+        
+        {/* Video background - silent, looping, cinematic */}
         <video
           autoPlay
           muted
           loop
           playsInline
-          poster={handsImage}
-          className="w-full h-full object-cover"
+          onCanPlay={() => setVideoLoaded(true)}
+          className={`w-full h-full object-cover transition-opacity duration-1000 ${
+            videoLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
         >
-          {/* Add video source when available */}
-          {/* <source src="/video/pottery-hero.mp4" type="video/mp4" /> */}
+          <source src={HERO_VIDEO_URL} type="video/mp4" />
         </video>
-        
-        {/* Fallback image */}
-        <img 
-          src={handsImage} 
-          alt="Hands shaping clay on pottery wheel" 
-          className="absolute inset-0 w-full h-full object-cover"
-        />
         
         {/* Natural light gradient - softer, more cinematic */}
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 via-transparent to-charcoal/50" />

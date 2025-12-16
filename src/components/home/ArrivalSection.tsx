@@ -2,8 +2,8 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import handsImage from "@/assets/hero/hands-pottery-wheel.jpg";
 
-// Free pottery video from Pexels (direct CDN link)
-const HERO_VIDEO_URL = "https://videos.pexels.com/video-files/6975128/6975128-uhd_2560_1440_25fps.mp4";
+// Local pottery video file
+const HERO_VIDEO_URL = "/video/pottery-hero.mp4";
 
 const ArrivalSection = () => {
   const ref = useRef(null);

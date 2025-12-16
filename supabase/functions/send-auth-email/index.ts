@@ -144,42 +144,52 @@ serve(async (req: Request): Promise<Response> => {
       });
     }
 
-    const client = new SMTPClient({
-      connection: {
-        hostname: "smtp.gmail.com",
-        port: 465,
-        tls: true,
-        auth: {
-          username: gmailUser,
-          password: gmailAppPassword,
+    const sendEmailViaGmail = async () => {
+      const client = new SMTPClient({
+        connection: {
+          hostname: "smtp.gmail.com",
+          port: 465,
+          tls: true,
+          auth: {
+            username: gmailUser,
+            password: gmailAppPassword,
+          },
         },
-      },
-    });
-
-    try {
-      await client.send({
-        from: `Bosco By Shivangi <${gmailUser}>`,
-        to: user.email,
-        subject: subject,
-        html: emailHtml,
       });
 
-      await client.close();
-      console.log("Auth email sent successfully via Gmail to:", user.email);
+      try {
+        await client.send({
+          from: `Bosco By Shivangi <${gmailUser}>`,
+          to: user.email,
+          subject,
+          html: emailHtml,
+        });
 
-      return new Response(JSON.stringify({}), {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      });
-    } catch (smtpError) {
-      console.error("SMTP error:", smtpError);
-      await client.close();
-      // Return 200 to let Supabase continue (fallback to default email)
-      return new Response(JSON.stringify({}), {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      });
+        console.log("Auth email sent successfully via Gmail to:", user.email);
+      } catch (smtpError) {
+        console.error("SMTP error:", smtpError);
+      } finally {
+        try {
+          await client.close();
+        } catch (closeError) {
+          console.error("SMTP close error:", closeError);
+        }
+      }
+    };
+
+    // Supabase Auth hooks time out after ~5s. Respond immediately and send the email in the background.
+    const edgeRuntime = (globalThis as unknown as { EdgeRuntime?: { waitUntil?: (p: Promise<unknown>) => void } }).EdgeRuntime;
+    if (edgeRuntime?.waitUntil) {
+      edgeRuntime.waitUntil(sendEmailViaGmail());
+    } else {
+      // Local/dev fallback
+      await sendEmailViaGmail();
     }
+
+    return new Response(JSON.stringify({}), {
+      status: 200,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
 
   } catch (error: unknown) {
     console.error("Error in send-auth-email function:", error);

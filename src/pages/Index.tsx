@@ -82,30 +82,44 @@ const Index = () => {
         )}
       </AnimatePresence>
       
-      <div className="min-h-screen">
-        <Navigation />
-        <main>
-          {/* Section 1: Arrival - First Impression */}
+      <div className="snap-container">
+        <Navigation isHomePage={true} />
+        
+        {/* Section 1: Arrival - First Impression */}
+        <section className="snap-section h-screen">
           <ArrivalSection />
-          
-          {/* Section 2: Cultural Grounding - Philosophy */}
+        </section>
+        
+        {/* Section 2: Cultural Grounding - Philosophy */}
+        <section className="snap-section h-screen">
           <CulturalGroundingSection />
-          
-          {/* Section 3: Craft Process - Shaping, Drying, Glazing, Firing */}
+        </section>
+        
+        {/* Section 3: Craft Process - Shaping, Drying, Glazing, Firing */}
+        <section className="snap-section h-screen">
           <CraftStepsSection />
-          
-          {/* Section 4: Textures & Materials - Sensory Grid */}
+        </section>
+        
+        {/* Section 4: Textures & Materials - Sensory Grid */}
+        <section className="snap-section h-screen">
           <TexturesGridSection />
-          
-          {/* Section 5: Products as Outcome - Editorial Layout */}
+        </section>
+        
+        {/* Section 5: Products as Outcome - Editorial Layout */}
+        <section className="snap-section min-h-screen">
           <ProductsShowcaseSection />
-          
-          {/* Section 6: Experiences & Workshops - Human Connection */}
+        </section>
+        
+        {/* Section 6: Experiences & Workshops - Human Connection */}
+        <section className="snap-section min-h-screen">
           <ExperiencesSection />
-          
-          {/* Section 7: Trust & Social Proof - Testimonials, Studio */}
+        </section>
+        
+        {/* Section 7: Trust & Social Proof - Testimonials, Studio */}
+        <section className="snap-section min-h-screen">
           <TrustSection />
-        </main>
+        </section>
+        
         <Footer />
       </div>
     </>

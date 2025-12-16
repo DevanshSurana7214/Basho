@@ -24,13 +24,20 @@ const navLinks = [
   { name: "Contact", path: "/contact" },
 ];
 
-const Navigation = () => {
+interface NavigationProps {
+  isHomePage?: boolean;
+}
+
+const Navigation = ({ isHomePage = false }: NavigationProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut, loading } = useAuth();
   const { isAdmin } = useAdmin();
+
+  // Check if we're on homepage based on route if not explicitly passed
+  const onHomePage = isHomePage || location.pathname === "/";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,6 +55,15 @@ const Navigation = () => {
     await signOut();
     navigate("/");
   };
+
+  // Determine text color based on page and scroll state
+  const textColorClass = onHomePage && !scrolled 
+    ? "text-cream" 
+    : "text-foreground";
+
+  const textHoverClass = onHomePage && !scrolled 
+    ? "text-cream/70 hover:text-cream" 
+    : "text-foreground/70 hover:text-foreground";
 
   return (
     <>
@@ -81,15 +97,15 @@ const Navigation = () => {
                     to={link.path}
                     className={`font-sans text-sm tracking-wide transition-all duration-300 relative ${
                       location.pathname === link.path
-                        ? "text-primary"
-                        : "text-foreground/70 hover:text-foreground"
+                        ? onHomePage && !scrolled ? "text-cream" : "text-primary"
+                        : textHoverClass
                     }`}
                   >
                     {link.name}
                     {location.pathname === link.path && (
                       <motion.span
                         layoutId="navUnderline"
-                        className="absolute -bottom-1 left-0 right-0 h-px bg-primary"
+                        className={`absolute -bottom-1 left-0 right-0 h-px ${onHomePage && !scrolled ? "bg-cream" : "bg-primary"}`}
                       />
                     )}
                   </Link>
@@ -97,8 +113,8 @@ const Navigation = () => {
               ))}
             </ul>
             
-            <div className="flex items-center gap-4 ml-4 border-l border-border pl-6">
-              <CartButton />
+            <div className={`flex items-center gap-4 ml-4 border-l pl-6 ${onHomePage && !scrolled ? "border-cream/30" : "border-border"}`}>
+              <CartButton className={onHomePage && !scrolled ? "text-cream hover:text-cream/80" : ""} />
               {!loading && (
                 user ? (
                   <DropdownMenu>
@@ -106,7 +122,7 @@ const Navigation = () => {
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="rounded-full hover:bg-muted transition-all duration-300"
+                        className={`rounded-full transition-all duration-300 ${onHomePage && !scrolled ? "text-cream hover:bg-cream/10" : "hover:bg-muted"}`}
                       >
                         <User className="h-4 w-4" />
                       </Button>
@@ -145,7 +161,7 @@ const Navigation = () => {
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="text-sm tracking-wide font-normal hover:bg-muted"
+                      className={`text-sm tracking-wide font-normal ${onHomePage && !scrolled ? "text-cream hover:bg-cream/10" : "hover:bg-muted"}`}
                     >
                       Sign In
                     </Button>
@@ -157,12 +173,12 @@ const Navigation = () => {
 
           {/* Mobile Menu Button */}
           <div className="flex items-center gap-4 lg:hidden">
-            <CartButton />
+            <CartButton className={onHomePage && !scrolled ? "text-cream hover:text-cream/80" : ""} />
             {!loading && (
               user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-full">
+                    <Button variant="ghost" size="icon" className={`rounded-full ${onHomePage && !scrolled ? "text-cream hover:bg-cream/10" : ""}`}>
                       <User className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -197,7 +213,7 @@ const Navigation = () => {
                 </DropdownMenu>
               ) : (
                 <Link to="/auth">
-                  <Button variant="ghost" size="sm" className="text-sm">
+                  <Button variant="ghost" size="sm" className={`text-sm ${onHomePage && !scrolled ? "text-cream hover:bg-cream/10" : ""}`}>
                     Sign In
                   </Button>
                 </Link>
@@ -205,7 +221,7 @@ const Navigation = () => {
             )}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 text-foreground hover:text-primary transition-colors"
+              className={`p-2 transition-colors ${onHomePage && !scrolled ? "text-cream hover:text-cream/80" : "text-foreground hover:text-primary"}`}
               aria-label="Toggle menu"
             >
               {isOpen ? <X size={20} /> : <Menu size={20} />}

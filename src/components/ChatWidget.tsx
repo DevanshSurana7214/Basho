@@ -129,22 +129,29 @@ const ChatWidget = () => {
     }
   };
 
+  const bounceVariants = {
+    idle: { y: 0, rotate: 0 },
+    bounce: {
+      y: [0, -20, 0, -12, 0, -6, 0],
+      rotate: [0, -5, 5, -3, 3, -1, 0],
+      transition: {
+        duration: 0.9,
+        ease: "easeInOut" as const,
+      },
+    },
+  };
+
   return (
     <>
       {/* Chat Bubble Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-terracotta to-terracotta/80 text-cream shadow-warm hover:shadow-xl transition-all duration-300 flex items-center justify-center border-2 border-cream/20"
+        className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-terracotta to-terracotta/80 text-cream shadow-warm hover:shadow-xl flex items-center justify-center border-2 border-cream/20"
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        animate={triggerBounce ? {
-          y: [0, -20, 0, -12, 0, -6, 0],
-          rotate: [0, -5, 5, -3, 3, -1, 0],
-        } : {}}
-        transition={triggerBounce ? {
-          duration: 0.9,
-          ease: "easeInOut",
-        } : { duration: 0.2 }}
+        initial="idle"
+        variants={bounceVariants}
+        animate={triggerBounce ? "bounce" : "idle"}
         aria-label="Open chat"
       >
         <AnimatePresence mode="wait">

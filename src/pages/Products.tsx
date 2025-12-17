@@ -17,6 +17,12 @@ import rakuDinnerPlate from "@/assets/products/raku-dinner-plate.jpg";
 import kintsugiPlatter from "@/assets/products/kintsugi-platter.jpg";
 import tokonameTeapot from "@/assets/products/tokoname-teapot.jpg";
 import ikebanaVase from "@/assets/products/ikebana-vase.jpg";
+import matchaBowl from "@/assets/products/matcha-bowl.jpg";
+import sakeSet from "@/assets/products/sake-set.jpg";
+import incenseHolder from "@/assets/products/incense-holder.jpg";
+import budVase from "@/assets/products/bud-vase.jpg";
+import soupBowls from "@/assets/products/soup-bowls.jpg";
+import butterDish from "@/assets/products/butter-dish.jpg";
 
 const productImages: Record<string, string> = {
   "Wabi-Sabi Bowl": wabiSabiBowl,
@@ -25,9 +31,15 @@ const productImages: Record<string, string> = {
   "Kintsugi Serving Platter": kintsugiPlatter,
   "Tokoname Tea Pot": tokonameTeapot,
   "Ikebana Vase": ikebanaVase,
+  "Matcha Bowl": matchaBowl,
+  "Sake Set": sakeSet,
+  "Zen Incense Holder": incenseHolder,
+  "Bud Vase": budVase,
+  "Soup Bowl Set": soupBowls,
+  "Butter Dish": butterDish,
 };
 
-const categories = ["All", "bowls", "cups", "vases", "plates", "platters", "teaware"];
+const categories = ["All", "bowls", "cups", "vases", "plates", "platters", "teaware", "accessories", "tableware"];
 
 interface Product {
   id: string;

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { ShoppingBag, Loader2 } from "lucide-react";
 import { ProductGridSkeleton } from "@/components/skeletons/ProductCardSkeleton";
 import ProductSearch from "@/components/ProductSearch";
+import ProductFilters from "@/components/ProductFilters";
 
 // Product images
 import wabiSabiBowl from "@/assets/products/wabi-sabi-bowl.jpg";
@@ -51,6 +52,7 @@ interface Product {
   category: string;
   image_url: string | null;
   in_stock: boolean;
+  created_at: string | null;
 }
 
 const Products = () => {
@@ -59,7 +61,26 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
   const { addToCart } = useCart();
+
+  // Calculate min/max prices from products
+  const { minPrice, maxPrice } = useMemo(() => {
+    if (products.length === 0) return { minPrice: 0, maxPrice: 50000 };
+    const prices = products.map(p => Number(p.price));
+    return {
+      minPrice: Math.floor(Math.min(...prices) / 100) * 100,
+      maxPrice: Math.ceil(Math.max(...prices) / 100) * 100,
+    };
+  }, [products]);
+
+  // Initialize price range when products load
+  useEffect(() => {
+    if (products.length > 0) {
+      setPriceRange([minPrice, maxPrice]);
+    }
+  }, [minPrice, maxPrice, products.length]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -98,9 +119,34 @@ const Products = () => {
         (p.description?.toLowerCase().includes(query) ?? false)
       );
     }
+
+    // Filter by price range
+    result = result.filter(p => {
+      const price = Number(p.price);
+      return price >= priceRange[0] && price <= priceRange[1];
+    });
+
+    // Sort products
+    result = [...result].sort((a, b) => {
+      switch (sortBy) {
+        case "price-low":
+          return Number(a.price) - Number(b.price);
+        case "price-high":
+          return Number(b.price) - Number(a.price);
+        case "name-asc":
+          return a.name.localeCompare(b.name);
+        case "name-desc":
+          return b.name.localeCompare(a.name);
+        case "oldest":
+          return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+        case "newest":
+        default:
+          return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+      }
+    });
     
     return result;
-  }, [products, activeCategory, searchQuery]);
+  }, [products, activeCategory, searchQuery, priceRange, sortBy]);
 
   const handleAddToCart = async (productId: string) => {
     setAddingToCart(productId);
@@ -149,8 +195,8 @@ const Products = () => {
           </section>
 
           {/* Category Filter */}
-          <section className="py-8 bg-background border-b border-border sticky top-16 z-30">
-            <div className="container px-6">
+          <section className="py-6 bg-background border-b border-border sticky top-16 z-30">
+            <div className="container px-6 space-y-4">
               <div className="flex flex-wrap gap-2">
                 {categories.map((cat) => (
                   <button
@@ -166,6 +212,14 @@ const Products = () => {
                   </button>
                 ))}
               </div>
+              <ProductFilters
+                minPrice={minPrice}
+                maxPrice={maxPrice}
+                priceRange={priceRange}
+                onPriceRangeChange={setPriceRange}
+                sortBy={sortBy}
+                onSortChange={setSortBy}
+              />
             </div>
           </section>
 

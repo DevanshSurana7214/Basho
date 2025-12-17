@@ -12,12 +12,18 @@ import { Helmet } from "react-helmet-async";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import PotteryVase3D from "@/components/PotteryVase3D";
+import PasswordStrengthIndicator, { validatePassword } from "@/components/PasswordStrengthIndicator";
 
 const signUpSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
   email: z.string().email("Invalid email address").max(255, "Email must be less than 255 characters"),
   phone: z.string().min(10, "Phone must be at least 10 digits").max(15, "Phone must be less than 15 digits"),
-  password: z.string().min(6, "Password must be at least 6 characters").max(72, "Password must be less than 72 characters"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .max(72, "Password must be less than 72 characters")
+    .regex(/[a-z]/, "Password must contain a lowercase letter")
+    .regex(/[A-Z]/, "Password must contain an uppercase letter")
+    .regex(/[0-9]/, "Password must contain a number"),
 });
 
 const signInSchema = z.object({
@@ -350,10 +356,10 @@ const Auth = () => {
   };
 
   const handleSetNewPassword = async () => {
-    if (newPassword.length < 6) {
+    if (!validatePassword(newPassword)) {
       toast({
-        title: "Password Too Short",
-        description: "Password must be at least 6 characters.",
+        title: "Weak Password",
+        description: "Password must meet all requirements.",
         variant: "destructive",
       });
       return;
@@ -626,6 +632,7 @@ const Auth = () => {
                               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                           </div>
+                          <PasswordStrengthIndicator password={newPassword} />
                         </div>
 
                         <div className="space-y-2">
@@ -903,6 +910,7 @@ const Auth = () => {
                           {errors.password && (
                             <p className="text-xs text-destructive">{errors.password}</p>
                           )}
+                          {!isLogin && <PasswordStrengthIndicator password={formData.password} />}
                         </div>
 
                         {isLogin && (

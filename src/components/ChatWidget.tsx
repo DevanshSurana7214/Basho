@@ -46,18 +46,18 @@ const ChatWidget = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Trigger bounce animation after Basho fade-in effect (approximately 3.5s)
+  // Trigger bounce animation after Basho fade-in effect (1.2s loading + 1s fade = ~2.5s)
   useEffect(() => {
-    if (!hasPlayedIntroAnimation) {
+    if (!hasPlayedIntroAnimation && !isOpen) {
       const timer = setTimeout(() => {
         setTriggerBounce(true);
         setHasPlayedIntroAnimation(true);
         // Reset bounce after animation completes
-        setTimeout(() => setTriggerBounce(false), 800);
-      }, 3500);
+        setTimeout(() => setTriggerBounce(false), 1000);
+      }, 2500);
       return () => clearTimeout(timer);
     }
-  }, [hasPlayedIntroAnimation]);
+  }, [hasPlayedIntroAnimation, isOpen]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -138,11 +138,11 @@ const ChatWidget = () => {
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
         animate={triggerBounce ? {
-          y: [0, -12, 0, -8, 0, -4, 0],
-          rotate: [0, -3, 3, -2, 2, -1, 0],
+          y: [0, -20, 0, -12, 0, -6, 0],
+          rotate: [0, -5, 5, -3, 3, -1, 0],
         } : {}}
         transition={triggerBounce ? {
-          duration: 0.7,
+          duration: 0.9,
           ease: "easeInOut",
         } : { duration: 0.2 }}
         aria-label="Open chat"

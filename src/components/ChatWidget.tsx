@@ -241,10 +241,23 @@ const ChatWidget = () => {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex justify-start"
                 >
-                  <div className="bg-white/90 text-charcoal px-5 py-3 rounded-2xl rounded-bl-sm border border-sand/30 shadow-soft">
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin text-terracotta" />
-                      <span className="text-sm text-charcoal/60">Thinking...</span>
+                  <div className="bg-white/90 text-charcoal px-5 py-4 rounded-2xl rounded-bl-sm border border-sand/30 shadow-soft">
+                    <div className="flex items-center gap-1.5">
+                      <motion.span
+                        className="w-2 h-2 bg-terracotta rounded-full"
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                      />
+                      <motion.span
+                        className="w-2 h-2 bg-terracotta rounded-full"
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.15 }}
+                      />
+                      <motion.span
+                        className="w-2 h-2 bg-terracotta rounded-full"
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.3 }}
+                      />
                     </div>
                   </div>
                 </motion.div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, User, Loader2, Trash2 } from "lucide-react";
+import { Star, User, Loader2, Trash2, Pencil, X, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -69,6 +69,11 @@ const ProductReviews = ({ productId }: ProductReviewsProps) => {
   const queryClient = useQueryClient();
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState("");
+  
+  // Edit state
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [editRating, setEditRating] = useState(5);
+  const [editComment, setEditComment] = useState("");
 
   // Fetch reviews with user profiles
   const { data: reviews = [], isLoading } = useQuery({
@@ -141,6 +146,30 @@ const ProductReviews = ({ productId }: ProductReviewsProps) => {
     },
   });
 
+  // Update review mutation
+  const updateReview = useMutation({
+    mutationFn: async ({ reviewId, rating, comment }: { reviewId: string; rating: number; comment: string }) => {
+      const { error } = await supabase
+        .from('product_reviews')
+        .update({
+          rating,
+          comment: comment.trim() || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', reviewId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['product-reviews', productId] });
+      setEditingReviewId(null);
+      toast.success("Review updated!");
+    },
+    onError: () => {
+      toast.error("Failed to update review");
+    },
+  });
+
   // Delete review mutation
   const deleteReview = useMutation({
     mutationFn: async (reviewId: string) => {
@@ -159,6 +188,22 @@ const ProductReviews = ({ productId }: ProductReviewsProps) => {
       toast.error("Failed to delete review");
     },
   });
+
+  const startEditing = (review: Review) => {
+    setEditingReviewId(review.id);
+    setEditRating(review.rating);
+    setEditComment(review.comment || "");
+  };
+
+  const cancelEditing = () => {
+    setEditingReviewId(null);
+    setEditRating(5);
+    setEditComment("");
+  };
+
+  const saveEdit = (reviewId: string) => {
+    updateReview.mutate({ reviewId, rating: editRating, comment: editComment });
+  };
 
   return (
     <section className="mt-16 pt-16 border-t border-border">
@@ -261,39 +306,110 @@ const ProductReviews = ({ productId }: ProductReviewsProps) => {
                 transition={{ delay: index * 0.05 }}
                 className="bg-card rounded-xl p-6 border border-border/50"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">
-                        {review.profile?.full_name || "Anonymous"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(review.created_at), 'MMM d, yyyy')}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <StarRating rating={review.rating} size="sm" />
-                    {user?.id === review.user_id && (
+                {editingReviewId === review.id ? (
+                  // Inline edit form
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <label className="text-sm text-muted-foreground mb-2 block">Rating</label>
+                        <StarRating
+                          rating={editRating}
+                          onRatingChange={setEditRating}
+                          interactive
+                        />
+                      </div>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => deleteReview.mutate(review.id)}
-                        disabled={deleteReview.isPending}
-                        className="text-destructive hover:text-destructive"
+                        onClick={cancelEditing}
+                        className="text-muted-foreground"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <X className="w-4 h-4" />
                       </Button>
-                    )}
+                    </div>
+                    <div>
+                      <label className="text-sm text-muted-foreground mb-2 block">Comment</label>
+                      <Textarea
+                        value={editComment}
+                        onChange={(e) => setEditComment(e.target.value)}
+                        placeholder="Update your review..."
+                        className="resize-none"
+                        rows={3}
+                        maxLength={1000}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="terracotta"
+                        size="sm"
+                        onClick={() => saveEdit(review.id)}
+                        disabled={updateReview.isPending}
+                      >
+                        {updateReview.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : (
+                          <Check className="w-4 h-4 mr-2" />
+                        )}
+                        Save
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={cancelEditing}
+                        disabled={updateReview.isPending}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                {review.comment && (
-                  <p className="mt-4 text-muted-foreground leading-relaxed">
-                    {review.comment}
-                  </p>
+                ) : (
+                  // Normal review display
+                  <>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <User className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">
+                            {review.profile?.full_name || "Anonymous"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(review.created_at), 'MMM d, yyyy')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <StarRating rating={review.rating} size="sm" />
+                        {user?.id === review.user_id && (
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => startEditing(review)}
+                              className="text-muted-foreground hover:text-foreground"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => deleteReview.mutate(review.id)}
+                              disabled={deleteReview.isPending}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {review.comment && (
+                      <p className="mt-4 text-muted-foreground leading-relaxed">
+                        {review.comment}
+                      </p>
+                    )}
+                  </>
                 )}
               </motion.div>
             ))}

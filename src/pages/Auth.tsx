@@ -561,97 +561,172 @@ const Auth = () => {
 
         {/* Right Side - Gradient Panel (Desktop Only) */}
         <div className="hidden lg:flex lg:w-1/2 p-4">
-          <div className="w-full h-full rounded-3xl bg-gradient-to-br from-wabi-sand/40 via-wabi-clay/30 to-wabi-earth/40 relative overflow-hidden flex items-center justify-center">
-            {/* Animated gradient overlay */}
+          <div className="w-full h-full rounded-3xl relative overflow-hidden flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(135deg, hsl(45 30% 94%) 0%, hsl(200 40% 85%) 25%, hsl(280 35% 80%) 50%, hsl(340 50% 80%) 75%, hsl(25 60% 85%) 100%)'
+            }}
+          >
+            {/* Animated gradient blobs */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-tr from-wabi-earth/20 via-transparent to-wabi-clay/30"
-              animate={{
-                opacity: [0.5, 0.8, 0.5],
+              className="absolute w-[600px] h-[600px] rounded-full opacity-60"
+              style={{
+                background: 'radial-gradient(circle, hsl(340 50% 85%) 0%, transparent 70%)',
+                top: '60%',
+                left: '50%',
               }}
-              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+              animate={{
+                scale: [1, 1.2, 1],
+                x: ['-50%', '-40%', '-50%'],
+                y: ['-50%', '-60%', '-50%'],
+              }}
+              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+              className="absolute w-[500px] h-[500px] rounded-full opacity-50"
+              style={{
+                background: 'radial-gradient(circle, hsl(200 50% 80%) 0%, transparent 70%)',
+                top: '20%',
+                right: '-10%',
+              }}
+              animate={{
+                scale: [1.2, 1, 1.2],
+                x: ['0%', '-10%', '0%'],
+                y: ['0%', '10%', '0%'],
+              }}
+              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            />
+            <motion.div
+              className="absolute w-[400px] h-[400px] rounded-full opacity-40"
+              style={{
+                background: 'radial-gradient(circle, hsl(280 40% 85%) 0%, transparent 70%)',
+                bottom: '10%',
+                left: '10%',
+              }}
+              animate={{
+                scale: [1, 1.3, 1],
+                x: ['0%', '15%', '0%'],
+                y: ['0%', '-10%', '0%'],
+              }}
+              transition={{ duration: 14, repeat: Infinity, ease: "easeInOut", delay: 2 }}
             />
             
-            {/* Floating pottery shapes animation */}
-            <div className="relative w-full h-full flex items-center justify-center">
-              {/* Central pottery wheel rings */}
+            {/* Floating particles */}
+            {[...Array(12)].map((_, i) => (
               <motion.div
-                className="absolute w-48 h-48 rounded-full border-4 border-wabi-earth/15"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  width: Math.random() * 20 + 8,
+                  height: Math.random() * 20 + 8,
+                  background: `hsl(${[340, 200, 280, 25, 45][i % 5]} ${30 + Math.random() * 30}% ${75 + Math.random() * 15}%)`,
+                  left: `${10 + Math.random() * 80}%`,
+                  top: `${10 + Math.random() * 80}%`,
+                  filter: 'blur(1px)',
+                }}
+                animate={{
+                  y: [0, -30 - Math.random() * 40, 0],
+                  x: [0, (Math.random() - 0.5) * 40, 0],
+                  opacity: [0.4, 0.8, 0.4],
+                  scale: [1, 1.2, 1],
+                }}
+                transition={{
+                  duration: 4 + Math.random() * 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: Math.random() * 3,
+                }}
               />
+            ))}
+            
+            {/* Rotating pottery wheel effect */}
+            <div className="absolute inset-0 flex items-center justify-center">
               <motion.div
-                className="absolute w-64 h-64 rounded-full border-2 border-wabi-clay/10"
-                animate={{ rotate: -360 }}
+                className="absolute w-72 h-72 rounded-full"
+                style={{
+                  border: '2px dashed hsl(25 40% 60% / 0.2)',
+                }}
+                animate={{ rotate: 360 }}
                 transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
               />
               <motion.div
-                className="absolute w-80 h-80 rounded-full border border-wabi-sand/15"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                className="absolute w-48 h-48 rounded-full"
+                style={{
+                  border: '1px solid hsl(340 40% 70% / 0.3)',
+                }}
+                animate={{ rotate: -360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
               />
-              
-              {/* Floating clay shapes */}
               <motion.div
-                className="absolute w-16 h-16 bg-wabi-earth/15 rounded-full blur-sm"
-                style={{ top: "20%", left: "25%" }}
+                className="absolute w-32 h-32 rounded-full"
+                style={{
+                  background: 'radial-gradient(circle, hsl(25 50% 75% / 0.3) 0%, transparent 70%)',
+                }}
                 animate={{ 
-                  y: [0, -20, 0],
                   scale: [1, 1.1, 1],
                 }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               />
+            </div>
+            
+            {/* Central pottery vase with glow */}
+            <motion.div
+              className="relative z-10"
+              animate={{ 
+                y: [0, -12, 0],
+                rotateY: [0, 5, 0, -5, 0],
+              }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            >
               <motion.div
-                className="absolute w-12 h-12 bg-wabi-clay/20 rounded-full blur-sm"
-                style={{ top: "60%", right: "20%" }}
-                animate={{ 
-                  y: [0, 15, 0],
-                  scale: [1, 0.9, 1],
+                className="absolute inset-0 blur-xl"
+                style={{
+                  background: 'radial-gradient(circle, hsl(25 50% 70% / 0.4) 0%, transparent 70%)',
                 }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-              />
-              <motion.div
-                className="absolute w-20 h-20 bg-wabi-earth/10 rounded-full blur-sm"
-                style={{ top: "35%", right: "30%" }}
-                animate={{ 
-                  y: [0, 25, 0],
+                animate={{
+                  scale: [1, 1.3, 1],
+                  opacity: [0.5, 0.8, 0.5],
                 }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               />
-              
-              {/* Vase silhouette */}
-              <motion.div
-                className="relative z-10"
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              <svg
+                viewBox="0 0 100 140"
+                className="w-40 h-56 relative z-10"
+                style={{ filter: 'drop-shadow(0 10px 30px hsl(25 50% 50% / 0.3))' }}
               >
-                <svg
-                  viewBox="0 0 100 140"
-                  className="w-32 h-44 text-wabi-earth/30"
-                  fill="currentColor"
-                >
-                  <path d="M50 0C45 0 40 5 38 12C36 19 35 28 35 35C35 42 34 48 32 52C30 56 27 60 25 65C23 70 22 76 22 82C22 95 28 106 38 115C42 118 45 122 47 128C48 132 49 136 50 140C51 136 52 132 53 128C55 122 58 118 62 115C72 106 78 95 78 82C78 76 77 70 75 65C73 60 70 56 68 52C66 48 65 42 65 35C65 28 64 19 62 12C60 5 55 0 50 0Z" />
-                </svg>
-              </motion.div>
-              
-              {/* Text overlay */}
-              <div className="absolute bottom-20 left-0 right-0 text-center">
-                <motion.p
-                  className="font-serif text-2xl text-wabi-earth/50 tracking-wide"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 1 }}
-                >
-                  Crafted with Soul
-                </motion.p>
-                <motion.p
-                  className="text-sm text-wabi-clay/40 mt-2 tracking-widest uppercase"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8, duration: 1 }}
-                >
-                  Bosco By Shivangi
-                </motion.p>
-              </div>
+                <defs>
+                  <linearGradient id="vaseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="hsl(25 45% 65%)" />
+                    <stop offset="50%" stopColor="hsl(20 50% 55%)" />
+                    <stop offset="100%" stopColor="hsl(15 55% 45%)" />
+                  </linearGradient>
+                </defs>
+                <path 
+                  d="M50 0C45 0 40 5 38 12C36 19 35 28 35 35C35 42 34 48 32 52C30 56 27 60 25 65C23 70 22 76 22 82C22 95 28 106 38 115C42 118 45 122 47 128C48 132 49 136 50 140C51 136 52 132 53 128C55 122 58 118 62 115C72 106 78 95 78 82C78 76 77 70 75 65C73 60 70 56 68 52C66 48 65 42 65 35C65 28 64 19 62 12C60 5 55 0 50 0Z" 
+                  fill="url(#vaseGradient)"
+                />
+              </svg>
+            </motion.div>
+            
+            {/* Text overlay */}
+            <div className="absolute bottom-16 left-0 right-0 text-center z-20">
+              <motion.p
+                className="font-serif text-2xl tracking-wide"
+                style={{ color: 'hsl(25 40% 35%)' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 1 }}
+              >
+                Crafted with Soul
+              </motion.p>
+              <motion.p
+                className="text-sm mt-2 tracking-widest uppercase"
+                style={{ color: 'hsl(25 30% 45% / 0.8)' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 1 }}
+              >
+                Bosco By Shivangi
+              </motion.p>
             </div>
           </div>
         </div>

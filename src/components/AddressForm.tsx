@@ -7,6 +7,9 @@ import { AddressFormData } from '@/hooks/useAddresses';
 import { z } from 'zod';
 import { Loader2 } from 'lucide-react';
 
+// Indian pincode validation: 6 digits, first digit 1-9
+const indianPincodeRegex = /^[1-9][0-9]{5}$/;
+
 const addressSchema = z.object({
   label: z.string().min(1, 'Label is required').max(50),
   name: z.string().min(2, 'Name must be at least 2 characters').max(100),
@@ -15,7 +18,7 @@ const addressSchema = z.object({
   landmark: z.string().max(100).optional(),
   city: z.string().min(2, 'City is required').max(100),
   state: z.string().min(2, 'State is required').max(100),
-  pincode: z.string().min(6, 'Pincode must be 6 digits').max(10),
+  pincode: z.string().regex(indianPincodeRegex, 'Enter a valid 6-digit Indian pincode'),
   is_default: z.boolean().optional(),
 });
 
@@ -67,7 +70,12 @@ export default function AddressForm({
   useEffect(() => {
     const fetchPincodeData = async () => {
       const pincode = formData.pincode.trim();
-      if (pincode.length !== 6) {
+      
+      // Validate pincode format before API call
+      if (!indianPincodeRegex.test(pincode)) {
+        if (pincode.length === 6) {
+          setPincodeError('Invalid pincode format. Must start with 1-9.');
+        }
         return;
       }
 
@@ -103,11 +111,18 @@ export default function AddressForm({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    // For pincode, only allow digits
+    if (name === 'pincode') {
+      const digitsOnly = value.replace(/\D/g, '').slice(0, 6);
+      setFormData(prev => ({ ...prev, [name]: digitsOnly }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
+      setPincodeError('');
+      return;
+    }
+    
     setFormData(prev => ({ ...prev, [name]: value }));
     setErrors(prev => ({ ...prev, [name]: '' }));
-    if (name === 'pincode') {
-      setPincodeError('');
-    }
   };
 
   const handleLabelSelect = (label: string) => {

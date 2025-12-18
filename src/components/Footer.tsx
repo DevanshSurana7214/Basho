@@ -4,7 +4,15 @@ import logo from "@/assets/logo-transparent.png";
 
 const Footer = () => {
   return (
-    <footer className="py-20 bg-footer text-footer-text border-t border-footer-muted/30">
+    <footer className="py-20 bg-footer text-footer-text border-t border-footer-muted/30 relative overflow-hidden">
+      {/* Clay grain texture overlay */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-20"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='clay'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23clay)'/%3E%3C/svg%3E")`,
+          mixBlendMode: 'soft-light'
+        }}
+      />
       <div className="container px-8 md:px-12 lg:px-16">
         <div className="grid md:grid-cols-4 gap-12 lg:gap-16">
           {/* Brand */}

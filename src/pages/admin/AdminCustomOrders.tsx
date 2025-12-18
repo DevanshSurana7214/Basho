@@ -56,15 +56,31 @@ interface CustomOrderRequest {
 }
 
 const statusOptions = [
-  { value: "pending", label: "Pending", gradient: "from-amber-400 to-yellow-500", bg: "bg-amber-50", text: "text-amber-800", dot: "bg-amber-500" },
-  { value: "under_review", label: "Under Review", gradient: "from-blue-400 to-indigo-500", bg: "bg-blue-50", text: "text-blue-800", dot: "bg-blue-500" },
-  { value: "payment_pending", label: "Payment Pending", gradient: "from-orange-400 to-red-400", bg: "bg-orange-50", text: "text-orange-800", dot: "bg-orange-500" },
-  { value: "payment_done", label: "Payment Done", gradient: "from-emerald-400 to-teal-500", bg: "bg-emerald-50", text: "text-emerald-800", dot: "bg-emerald-500" },
-  { value: "in_progress", label: "In Progress", gradient: "from-violet-400 to-purple-500", bg: "bg-violet-50", text: "text-violet-800", dot: "bg-violet-500" },
-  { value: "in_delivery", label: "In Delivery", gradient: "from-cyan-400 to-blue-500", bg: "bg-cyan-50", text: "text-cyan-800", dot: "bg-cyan-500" },
-  { value: "delivered", label: "Delivered", gradient: "from-green-400 to-emerald-500", bg: "bg-green-50", text: "text-green-800", dot: "bg-green-500" },
-  { value: "rejected", label: "Rejected", gradient: "from-rose-400 to-red-500", bg: "bg-rose-50", text: "text-rose-800", dot: "bg-rose-500" },
+  { value: "pending", label: "Pending", gradient: "from-amber-400 to-yellow-500", bg: "bg-amber-50", text: "text-amber-800", dot: "bg-amber-500", order: 0 },
+  { value: "under_review", label: "Under Review", gradient: "from-blue-400 to-indigo-500", bg: "bg-blue-50", text: "text-blue-800", dot: "bg-blue-500", order: 1 },
+  { value: "payment_pending", label: "Payment Pending", gradient: "from-orange-400 to-red-400", bg: "bg-orange-50", text: "text-orange-800", dot: "bg-orange-500", order: 2 },
+  { value: "payment_done", label: "Payment Done", gradient: "from-emerald-400 to-teal-500", bg: "bg-emerald-50", text: "text-emerald-800", dot: "bg-emerald-500", order: 3 },
+  { value: "in_progress", label: "In Progress", gradient: "from-violet-400 to-purple-500", bg: "bg-violet-50", text: "text-violet-800", dot: "bg-violet-500", order: 4 },
+  { value: "in_delivery", label: "In Delivery", gradient: "from-cyan-400 to-blue-500", bg: "bg-cyan-50", text: "text-cyan-800", dot: "bg-cyan-500", order: 5 },
+  { value: "delivered", label: "Delivered", gradient: "from-green-400 to-emerald-500", bg: "bg-green-50", text: "text-green-800", dot: "bg-green-500", order: 6 },
+  { value: "rejected", label: "Rejected", gradient: "from-rose-400 to-red-500", bg: "bg-rose-50", text: "text-rose-800", dot: "bg-rose-500", order: 7 },
 ];
+
+const getStatusOrder = (status: string) => {
+  const option = statusOptions.find((o) => o.value === status);
+  return option?.order ?? 0;
+};
+
+const canTransitionTo = (currentStatus: string, targetStatus: string) => {
+  // Rejected is a special terminal state - can't transition from it
+  if (currentStatus === "rejected") return false;
+  // Delivered is also terminal
+  if (currentStatus === "delivered") return false;
+  // Can always transition to rejected from any non-terminal state
+  if (targetStatus === "rejected") return true;
+  // Otherwise only allow forward progression
+  return getStatusOrder(targetStatus) > getStatusOrder(currentStatus);
+};
 
 const emailTemplates = [
   { value: "payment_request", label: "Request Payment", icon: CreditCard, description: "Send payment link to customer" },
@@ -363,15 +379,17 @@ const AdminCustomOrders = () => {
                         <div className="space-y-1">
                           {statusOptions.map((option) => {
                             const isSelected = request.status === option.value;
+                            const isDisabled = !canTransitionTo(request.status, option.value) && !isSelected;
                             return (
                               <SelectItem 
                                 key={option.value} 
                                 value={option.value}
-                                className={`rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-150 focus:bg-muted/80 ${isSelected ? 'bg-muted' : 'hover:bg-muted/50'}`}
+                                disabled={isDisabled}
+                                className={`rounded-lg px-3 py-2.5 transition-all duration-150 focus:bg-muted/80 ${isSelected ? 'bg-muted' : 'hover:bg-muted/50'} ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
                               >
                                 <div className="flex items-center gap-3 w-full">
-                                  <span className={`w-2.5 h-2.5 rounded-full bg-gradient-to-br ${option.gradient} shadow-sm`} />
-                                  <span className={`text-sm font-medium ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>
+                                  <span className={`w-2.5 h-2.5 rounded-full bg-gradient-to-br ${option.gradient} shadow-sm ${isDisabled ? 'opacity-50' : ''}`} />
+                                  <span className={`text-sm font-medium ${isSelected ? 'text-foreground' : isDisabled ? 'text-muted-foreground/50' : 'text-muted-foreground'}`}>
                                     {option.label}
                                   </span>
                                   {isSelected && (

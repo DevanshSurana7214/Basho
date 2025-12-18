@@ -58,7 +58,7 @@ const productImages: Record<string, string> = {
   "Meadow Flower Mugs": meadowFlowerMugs,
 };
 
-const categories = ["All", "Tableware", "Artifacts"];
+const categories = ["All", "Mugs", "Bowls", "Plates", "Platters", "Tea Sets", "Storage", "Sculptures", "Planters"];
 
 interface Product {
   id: string;

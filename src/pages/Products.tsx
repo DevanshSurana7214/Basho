@@ -186,27 +186,75 @@ const Products = () => {
           {/* Hero */}
           <section className="py-16 bg-gradient-to-b from-sand to-background">
             <div className="container px-6">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="max-w-2xl"
-              >
-                <span className="font-sans text-xs tracking-[0.3em] uppercase text-primary">
-                  Collection
-                </span>
-                <h1 className="font-serif text-4xl md:text-5xl text-foreground mt-4">
-                  Our Products
-                </h1>
-                <p className="font-sans text-muted-foreground mt-4 mb-6">
-                  Each piece is wheel-thrown by hand and fired in our studio. 
-                  All items are food-safe, microwave-safe, and dishwasher-safe.
-                </p>
-                <ProductSearch 
-                  onSearch={setSearchQuery} 
-                  productImages={productImages} 
-                />
-              </motion.div>
+              <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
+                {/* Left side - Collection info */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <span className="font-sans text-xs tracking-[0.3em] uppercase text-primary">
+                    Collection
+                  </span>
+                  <h1 className="font-serif text-4xl md:text-5xl text-foreground mt-4">
+                    Our Products
+                  </h1>
+                  <p className="font-sans text-muted-foreground mt-4 mb-6">
+                    Each piece is wheel-thrown by hand and fired in our studio. 
+                    All items are food-safe, microwave-safe, and dishwasher-safe.
+                  </p>
+                  <ProductSearch 
+                    onSearch={setSearchQuery} 
+                    productImages={productImages} 
+                  />
+                </motion.div>
+
+                {/* Right side - Custom Order CTA */}
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="relative group"
+                >
+                  <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-terracotta/30 to-amber/30 rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl p-6 lg:p-8 overflow-hidden">
+                    {/* Decorative elements */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-terracotta/10 to-transparent rounded-full translate-y-1/2 -translate-x-1/2" />
+                    
+                    <div className="relative z-10">
+                      <span className="inline-flex items-center gap-2 font-sans text-xs tracking-[0.2em] uppercase text-primary bg-primary/10 px-3 py-1.5 rounded-full">
+                        <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+                        Bespoke
+                      </span>
+                      <h2 className="font-serif text-2xl lg:text-3xl text-foreground mt-4">
+                        Can't Find What You're Looking For?
+                      </h2>
+                      <p className="font-sans text-muted-foreground mt-3 text-sm lg:text-base">
+                        Let us craft something unique just for you. Share your vision and we'll bring it to life with the same care and craftsmanship.
+                      </p>
+                      <Button 
+                        variant="terracotta" 
+                        size="lg" 
+                        asChild 
+                        className="mt-6 group/btn"
+                      >
+                        <Link to="/products/custom" className="flex items-center gap-2">
+                          Request Custom Order
+                          <motion.span
+                            className="inline-block"
+                            initial={{ x: 0 }}
+                            whileHover={{ x: 4 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            →
+                          </motion.span>
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
             </div>
           </section>
 

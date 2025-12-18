@@ -21,6 +21,16 @@ import minimalistCreamMugs from "@/assets/products/minimalist-cream-mugs.jpg";
 import rusticDuoMugSet from "@/assets/products/rustic-duo-mug-set.jpg";
 import indigoPlanters from "@/assets/products/indigo-planters.jpg";
 import fortuneCookieKeepsakes from "@/assets/products/fortune-cookie-keepsakes.jpg";
+import hexagonalPastelPlates from "@/assets/products/hexagonal-pastel-plates.jpg";
+import songbirdTeaSet from "@/assets/products/songbird-tea-set.jpg";
+import oceanPaletteBowls from "@/assets/products/ocean-palette-bowls.jpg";
+import prayingHandsCollection from "@/assets/products/praying-hands-collection.jpg";
+import terracottaFruitBowls from "@/assets/products/terracotta-fruit-bowls.jpg";
+import birdLidStorageJars from "@/assets/products/bird-lid-storage-jars.jpg";
+import turquoiseGeometricMugs from "@/assets/products/turquoise-geometric-mugs.jpg";
+import oceanBlueMugs from "@/assets/products/ocean-blue-mugs.jpg";
+import ceramicGraterPlates from "@/assets/products/ceramic-grater-plates.jpg";
+import cloudServingPlatters from "@/assets/products/cloud-serving-platters.jpg";
 
 const productImages: Record<string, string> = {
   "Cupped Hands Sculpture": cuppedHandsSculpture,
@@ -31,6 +41,16 @@ const productImages: Record<string, string> = {
   "Rustic Duo Mug Set": rusticDuoMugSet,
   "Indigo Planters": indigoPlanters,
   "Fortune Cookie Keepsakes": fortuneCookieKeepsakes,
+  "Hexagonal Pastel Plates": hexagonalPastelPlates,
+  "Songbird Tea Set": songbirdTeaSet,
+  "Ocean Palette Bowls": oceanPaletteBowls,
+  "Praying Hands Collection": prayingHandsCollection,
+  "Terracotta Fruit Bowls": terracottaFruitBowls,
+  "Bird Lid Storage Jars": birdLidStorageJars,
+  "Turquoise Geometric Mugs": turquoiseGeometricMugs,
+  "Ocean Blue Mugs": oceanBlueMugs,
+  "Ceramic Grater Plates": ceramicGraterPlates,
+  "Cloud Serving Platters": cloudServingPlatters,
 };
 
 interface Product {

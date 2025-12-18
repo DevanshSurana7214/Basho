@@ -61,9 +61,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Wabi-sabi palette
-        clay: "hsl(var(--clay))",
+        // Wabi-sabi palette - brand colors
+        "deep-clay": "hsl(var(--deep-clay))",
+        "kiln-brown": "hsl(var(--kiln-brown))",
         terracotta: "hsl(var(--terracotta))",
+        "warm-rust": "hsl(var(--warm-rust))",
+        parchment: "hsl(var(--parchment))",
+        // Extended palette
+        clay: "hsl(var(--clay))",
         sand: "hsl(var(--sand))",
         stone: "hsl(var(--stone))",
         cream: "hsl(var(--cream))",
@@ -72,6 +77,14 @@ export default {
         amber: "hsl(var(--amber))",
         copper: "hsl(var(--copper))",
         paper: "hsl(var(--paper))",
+        "paper-dark": "hsl(var(--paper-dark))",
+        "warm-white": "hsl(var(--warm-white))",
+        // Footer specific
+        footer: {
+          DEFAULT: "hsl(var(--footer-bg))",
+          text: "hsl(var(--footer-text))",
+          muted: "hsl(var(--footer-muted))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

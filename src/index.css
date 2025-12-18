@@ -6,135 +6,164 @@
 
 @layer base {
   :root {
-    /* New Earthy Palette - From brand colors */
-    /* #EDD8B4 (cream), #C85428 (terracotta), #8E5022 (copper), #652810 (clay), #442D1C (chocolate) */
+    /* ===== WABI-SABI EARTHY PALETTE ===== */
+    /* Deep Clay Brown: #442D1C | Kiln Brown: #652810 | Raw Terracotta: #8E5022 | Warm Rust: #C85428 | Parchment: #EDD8B4 */
     
-    --background: 39 62% 82%;
+    /* BACKGROUND & LAYOUT - warm off-white parchment */
+    --background: 39 50% 91%;
     --foreground: 22 43% 19%;
 
-    --card: 39 55% 88%;
+    /* Card backgrounds - soft parchment, never pure white */
+    --card: 39 45% 88%;
     --card-foreground: 22 43% 19%;
 
-    --popover: 39 55% 88%;
+    --popover: 39 45% 90%;
     --popover-foreground: 22 43% 19%;
 
-    /* Terracotta primary */
-    --primary: 17 66% 47%;
-    --primary-foreground: 39 62% 95%;
+    /* PRIMARY - Kiln Brown #652810 for buttons */
+    --primary: 15 73% 23%;
+    --primary-foreground: 39 62% 90%;
 
-    /* Warm cream secondary */
-    --secondary: 39 50% 78%;
+    /* SECONDARY - softer parchment variations */
+    --secondary: 39 40% 85%;
     --secondary-foreground: 22 43% 19%;
 
-    /* Soft muted tones */
-    --muted: 39 45% 75%;
-    --muted-foreground: 25 40% 35%;
+    /* MUTED - for captions and helper text */
+    --muted: 39 35% 82%;
+    --muted-foreground: 25 50% 38%;
 
-    /* Copper accent */
+    /* ACCENT - Raw Terracotta #8E5022 for links */
     --accent: 25 61% 35%;
-    --accent-foreground: 39 62% 95%;
+    --accent-foreground: 39 55% 92%;
 
-    --destructive: 0 65% 50%;
-    --destructive-foreground: 39 62% 95%;
+    /* DESTRUCTIVE - muted, harmonious red */
+    --destructive: 8 45% 40%;
+    --destructive-foreground: 39 55% 92%;
 
-    --border: 39 40% 72%;
-    --input: 39 40% 72%;
+    /* BORDERS & INPUTS - light clay brown */
+    --border: 25 30% 75%;
+    --input: 39 35% 86%;
     --ring: 17 66% 47%;
 
     --radius: 0.25rem;
 
-    /* Custom tokens - new brand palette */
+    /* ===== CUSTOM SEMANTIC TOKENS ===== */
+    /* Brand colors mapped directly */
+    --deep-clay: 22 43% 19%;        /* #442D1C - headings, footer bg */
+    --kiln-brown: 15 73% 23%;       /* #652810 - primary buttons, subheadings */
+    --terracotta: 25 61% 35%;       /* #8E5022 - links, secondary buttons */
+    --warm-rust: 17 66% 47%;        /* #C85428 - hover accents only */
+    --parchment: 39 62% 82%;        /* #EDD8B4 - base reference */
+    
+    /* Extended palette */
     --clay: 15 73% 23%;
-    --terracotta: 17 66% 47%;
-    --sand: 39 55% 80%;
-    --stone: 25 61% 35%;
-    --cream: 39 62% 82%;
+    --sand: 39 45% 84%;
+    --stone: 25 45% 45%;
+    --cream: 39 50% 91%;
     --charcoal: 22 43% 19%;
-    --moss: 90 15% 35%;
+    --paper: 39 40% 88%;
+    --paper-dark: 39 35% 82%;
+    --warm-white: 39 55% 94%;
+    --copper: 17 50% 42%;
     --amber: 25 55% 45%;
-    --copper: 15 73% 23%;
-    --warm-white: 39 60% 92%;
-    --paper: 39 50% 85%;
+    --moss: 90 12% 35%;
+
+    /* Footer specific */
+    --footer-bg: 22 43% 19%;
+    --footer-text: 39 62% 88%;
+    --footer-muted: 15 40% 35%;
 
     /* Typography */
     --font-serif: 'Cormorant Garamond', Georgia, serif;
     --font-sans: 'DM Sans', system-ui, sans-serif;
 
-    /* Refined shadows - using new palette */
-    --shadow-soft: 0 2px 15px -3px hsl(22 43% 19% / 0.08);
-    --shadow-warm: 0 4px 25px -5px hsl(17 66% 47% / 0.12);
-    --shadow-elevated: 0 10px 40px -10px hsl(22 43% 19% / 0.15);
+    /* Refined shadows - subtle, clay-tinted */
+    --shadow-soft: 0 2px 15px -3px hsl(22 43% 19% / 0.06);
+    --shadow-warm: 0 4px 25px -5px hsl(25 61% 35% / 0.08);
+    --shadow-elevated: 0 10px 40px -10px hsl(22 43% 19% / 0.1);
 
     /* Slow, elegant transitions */
     --transition-smooth: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
 
-    --sidebar-background: 39 62% 82%;
+    /* Sidebar - matches navbar parchment */
+    --sidebar-background: 39 50% 89%;
     --sidebar-foreground: 22 43% 19%;
-    --sidebar-primary: 17 66% 47%;
-    --sidebar-primary-foreground: 39 62% 95%;
-    --sidebar-accent: 39 50% 78%;
+    --sidebar-primary: 15 73% 23%;
+    --sidebar-primary-foreground: 39 62% 90%;
+    --sidebar-accent: 39 40% 85%;
     --sidebar-accent-foreground: 22 43% 19%;
-    --sidebar-border: 39 40% 72%;
+    --sidebar-border: 25 30% 75%;
     --sidebar-ring: 17 66% 47%;
   }
 
   .dark {
-    /* Dark mode: chocolate background, cream text */
+    /* Dark mode - Deep clay background, parchment text */
     --background: 22 43% 12%;
-    --foreground: 39 55% 85%;
+    --foreground: 39 50% 88%;
 
-    --card: 22 40% 15%;
-    --card-foreground: 39 55% 85%;
+    --card: 22 38% 16%;
+    --card-foreground: 39 50% 88%;
 
-    --popover: 22 40% 14%;
-    --popover-foreground: 39 55% 85%;
+    --popover: 22 38% 14%;
+    --popover-foreground: 39 50% 88%;
 
-    --primary: 17 60% 55%;
-    --primary-foreground: 22 43% 12%;
+    /* Primary - lighter kiln brown for dark bg */
+    --primary: 15 60% 35%;
+    --primary-foreground: 39 55% 92%;
 
-    --secondary: 22 35% 22%;
-    --secondary-foreground: 39 50% 82%;
+    --secondary: 22 32% 22%;
+    --secondary-foreground: 39 45% 82%;
 
-    --muted: 22 30% 20%;
-    --muted-foreground: 39 40% 60%;
+    --muted: 22 28% 20%;
+    --muted-foreground: 39 35% 58%;
 
-    --accent: 25 55% 45%;
-    --accent-foreground: 39 55% 90%;
+    --accent: 25 50% 45%;
+    --accent-foreground: 39 50% 92%;
 
-    --destructive: 0 60% 50%;
-    --destructive-foreground: 39 55% 90%;
+    --destructive: 8 45% 45%;
+    --destructive-foreground: 39 50% 92%;
 
-    --border: 22 30% 25%;
-    --input: 22 30% 25%;
-    --ring: 17 60% 55%;
+    --border: 22 28% 25%;
+    --input: 22 28% 22%;
+    --ring: 17 55% 50%;
 
-    /* Custom dark tokens */
-    --clay: 17 55% 50%;
-    --terracotta: 17 60% 55%;
-    --sand: 39 35% 30%;
-    --stone: 25 45% 40%;
-    --cream: 39 55% 85%;
+    /* Dark custom tokens */
+    --deep-clay: 39 50% 88%;
+    --kiln-brown: 15 55% 45%;
+    --terracotta: 25 50% 50%;
+    --warm-rust: 17 55% 55%;
+    --parchment: 22 43% 12%;
+    
+    --clay: 15 55% 45%;
+    --sand: 39 30% 28%;
+    --stone: 25 40% 42%;
+    --cream: 39 50% 88%;
     --charcoal: 22 43% 12%;
-    --moss: 90 15% 38%;
+    --paper: 22 32% 18%;
+    --paper-dark: 22 28% 15%;
+    --warm-white: 39 50% 88%;
+    --copper: 17 50% 50%;
     --amber: 25 50% 50%;
-    --copper: 17 50% 45%;
-    --warm-white: 39 55% 85%;
-    --paper: 22 35% 18%;
+    --moss: 90 12% 40%;
+
+    --footer-bg: 22 43% 10%;
+    --footer-text: 39 55% 85%;
+    --footer-muted: 15 35% 40%;
 
     /* Dark shadows */
-    --shadow-soft: 0 2px 15px -3px hsl(0 0% 0% / 0.3);
-    --shadow-warm: 0 4px 25px -5px hsl(17 60% 55% / 0.2);
-    --shadow-elevated: 0 10px 40px -10px hsl(0 0% 0% / 0.4);
+    --shadow-soft: 0 2px 15px -3px hsl(0 0% 0% / 0.25);
+    --shadow-warm: 0 4px 25px -5px hsl(17 55% 50% / 0.15);
+    --shadow-elevated: 0 10px 40px -10px hsl(0 0% 0% / 0.35);
 
     --sidebar-background: 22 43% 12%;
-    --sidebar-foreground: 39 55% 85%;
-    --sidebar-primary: 17 60% 55%;
-    --sidebar-primary-foreground: 22 43% 12%;
-    --sidebar-accent: 22 35% 22%;
-    --sidebar-accent-foreground: 39 50% 82%;
-    --sidebar-border: 22 30% 25%;
-    --sidebar-ring: 17 60% 55%;
+    --sidebar-foreground: 39 50% 88%;
+    --sidebar-primary: 15 60% 35%;
+    --sidebar-primary-foreground: 39 55% 92%;
+    --sidebar-accent: 22 32% 22%;
+    --sidebar-accent-foreground: 39 45% 82%;
+    --sidebar-border: 22 28% 25%;
+    --sidebar-ring: 17 55% 50%;
   }
 }
 

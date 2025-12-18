@@ -357,7 +357,7 @@ const Products = () => {
                   to life. Share your ideas with us and let's create together.
                 </p>
                 <Button variant="terracotta" size="lg" asChild>
-                  <a href="/contact">Request Custom Order</a>
+                  <Link to="/products/custom">Request Custom Order</Link>
                 </Button>
               </motion.div>
             </div>

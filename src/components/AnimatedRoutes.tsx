@@ -7,6 +7,7 @@ import Index from "@/pages/Index";
 import About from "@/pages/About";
 import Products from "@/pages/Products";
 import ProductDetail from "@/pages/ProductDetail";
+import CustomOrders from "@/pages/CustomOrders";
 import Workshops from "@/pages/Workshops";
 import Studio from "@/pages/Studio";
 import Contact from "@/pages/Contact";
@@ -29,6 +30,7 @@ const AnimatedRoutes = () => {
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
         <Route path="/about" element={<PageTransition><About /></PageTransition>} />
         <Route path="/products" element={<PageTransition><Products /></PageTransition>} />
+        <Route path="/products/custom" element={<PageTransition><CustomOrders /></PageTransition>} />
         <Route path="/products/:productId" element={<PageTransition><ProductDetail /></PageTransition>} />
         <Route path="/workshops" element={<PageTransition><Workshops /></PageTransition>} />
         <Route path="/studio" element={<PageTransition><Studio /></PageTransition>} />

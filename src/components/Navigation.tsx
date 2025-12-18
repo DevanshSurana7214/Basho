@@ -57,8 +57,8 @@ const Navigation = () => {
         transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
         className={`fixed z-50 left-0 right-0 transition-all duration-700 ${
           scrolled
-            ? "top-0 bg-background/95 backdrop-blur-md border-b border-border"
-            : "top-6 bg-transparent"
+            ? "top-0 bg-parchment/70 backdrop-blur-md border-b border-border/50"
+            : "top-6 bg-parchment/50 backdrop-blur-sm"
         }`}
       >
         <nav className="container mx-auto px-6 md:px-8 lg:px-12 py-4 flex items-center justify-between">
@@ -79,10 +79,10 @@ const Navigation = () => {
                 <li key={link.name}>
                   <Link
                     to={link.path}
-                    className={`font-sans text-sm tracking-wide transition-all duration-300 relative ${
+                    className={`font-sans text-sm font-medium tracking-wide transition-all duration-300 relative ${
                       location.pathname === link.path
-                        ? "text-primary"
-                        : "text-foreground/70 hover:text-foreground"
+                        ? "text-primary font-semibold"
+                        : "text-deep-clay hover:text-primary"
                     }`}
                   >
                     {link.name}

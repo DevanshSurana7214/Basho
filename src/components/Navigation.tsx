@@ -66,7 +66,7 @@ const Navigation = () => {
             <motion.img 
               src={logo} 
               alt="Basho by Shivangi" 
-              className="h-8 md:h-10 w-auto"
+              className="h-12 md:h-14 w-auto"
               whileHover={{ opacity: 0.8 }}
               transition={{ duration: 0.3 }}
             />

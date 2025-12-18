@@ -10,7 +10,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="md:col-span-2 space-y-6">
             <Link to="/">
-              <img src={logo} alt="Basho by Shivangi" className="h-10 w-auto" />
+              <img src={logo} alt="Basho by Shivangi" className="h-14 w-auto" />
             </Link>
             <p className="font-sans text-sm text-muted-foreground max-w-sm leading-relaxed">
               Handcrafted Japanese-inspired pottery. Each piece tells a story of earth, fire, and wabi-sabi.

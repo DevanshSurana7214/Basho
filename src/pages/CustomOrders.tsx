@@ -157,6 +157,29 @@ const CustomOrders = () => {
     setIsSubmitting(true);
     
     try {
+      // Upload reference images to storage
+      const uploadedImageUrls: string[] = [];
+      
+      for (const file of referenceImages) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('custom-order-images')
+          .upload(fileName, file);
+        
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          continue;
+        }
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('custom-order-images')
+          .getPublicUrl(fileName);
+        
+        uploadedImageUrls.push(publicUrl);
+      }
+
       const { error } = await supabase
         .from("custom_order_requests")
         .insert({
@@ -168,6 +191,7 @@ const CustomOrders = () => {
           usage_description: formData.usage.trim(),
           notes: formData.notes.trim() || null,
           shipping_address: selectedAddress ? formatAddressString(selectedAddress) : null,
+          reference_images: uploadedImageUrls,
         });
 
       if (error) throw error;

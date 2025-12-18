@@ -29,7 +29,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Eye, Trash2, Mail, Phone, Calendar, Ruler, FileText, Loader2, MapPin } from "lucide-react";
+import { Eye, Trash2, Mail, Phone, Calendar, Ruler, FileText, Loader2, MapPin, Image, X } from "lucide-react";
 
 interface CustomOrderRequest {
   id: string;
@@ -40,6 +40,7 @@ interface CustomOrderRequest {
   usage_description: string;
   notes: string | null;
   shipping_address: string | null;
+  reference_images: string[] | null;
   status: string;
   admin_notes: string | null;
   estimated_price: number | null;
@@ -116,6 +117,44 @@ const AdminCustomOrders = () => {
     },
     onError: () => {
       toast.error("Failed to delete request");
+    },
+  });
+
+  const deleteImageMutation = useMutation({
+    mutationFn: async ({ requestId, imageUrl, allImages }: { requestId: string; imageUrl: string; allImages: string[] }) => {
+      // Extract the file path from the URL
+      const urlParts = imageUrl.split('/custom-order-images/');
+      if (urlParts.length < 2) throw new Error('Invalid image URL');
+      const filePath = urlParts[1];
+
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from('custom-order-images')
+        .remove([filePath]);
+
+      if (storageError) throw storageError;
+
+      // Update the request to remove the image URL
+      const updatedImages = allImages.filter(img => img !== imageUrl);
+      const { error: dbError } = await supabase
+        .from('custom_order_requests')
+        .update({ reference_images: updatedImages })
+        .eq('id', requestId);
+
+      if (dbError) throw dbError;
+
+      return { requestId, updatedImages };
+    },
+    onSuccess: ({ requestId, updatedImages }) => {
+      queryClient.invalidateQueries({ queryKey: ["custom-order-requests"] });
+      if (selectedRequest && selectedRequest.id === requestId) {
+        setSelectedRequest({ ...selectedRequest, reference_images: updatedImages });
+      }
+      toast.success("Image deleted");
+    },
+    onError: (error) => {
+      console.error('Error deleting image:', error);
+      toast.error("Failed to delete image");
     },
   });
 
@@ -330,6 +369,45 @@ const AdminCustomOrders = () => {
                     <p className="text-sm text-foreground bg-muted/30 p-3 rounded-lg mt-2">
                       {selectedRequest.notes}
                     </p>
+                  </div>
+                )}
+
+                {/* Reference Images */}
+                {selectedRequest.reference_images && selectedRequest.reference_images.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Image className="h-4 w-4 text-primary" />
+                      <span className="text-sm text-muted-foreground">Reference Images:</span>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {selectedRequest.reference_images.map((imageUrl, index) => (
+                        <div key={index} className="relative group">
+                          <a href={imageUrl} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={imageUrl}
+                              alt={`Reference ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg border border-border hover:border-primary/50 transition-colors"
+                            />
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (confirm("Delete this reference image?")) {
+                                deleteImageMutation.mutate({
+                                  requestId: selectedRequest.id,
+                                  imageUrl,
+                                  allImages: selectedRequest.reference_images || [],
+                                });
+                              }
+                            }}
+                            disabled={deleteImageMutation.isPending}
+                            className="absolute top-1 right-1 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/90"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

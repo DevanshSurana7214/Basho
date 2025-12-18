@@ -30,6 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Eye, Trash2, Mail, Phone, Calendar, Ruler, FileText, Loader2, MapPin, Image, X, Send, CreditCard, Truck, Package } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface EmailSent {
   type: string;
@@ -253,14 +254,37 @@ const AdminCustomOrders = () => {
     setIsDetailOpen(false);
   };
 
-  const getStatusBadge = (status: string, isCompact = false) => {
+  const getStatusBadge = (status: string, isCompact = false, animate = false) => {
     const option = statusOptions.find((o) => o.value === status);
-    return (
+    const badgeContent = (
       <span className={`inline-flex items-center gap-2 ${isCompact ? 'px-2.5 py-1' : 'px-3 py-1.5'} rounded-lg ${option?.bg || "bg-muted"} ${option?.text || "text-foreground"} shadow-sm border border-black/5 transition-all duration-200 hover:shadow-md`}>
         <span className={`w-2 h-2 rounded-full ${option?.dot || "bg-muted-foreground"} animate-pulse`} />
         <span className="text-xs font-semibold tracking-wide">{option?.label || status}</span>
       </span>
     );
+
+    if (animate) {
+      return (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={status}
+            initial={{ scale: 0.8, opacity: 0, y: -10 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.8, opacity: 0, y: 10 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 500, 
+              damping: 30,
+              duration: 0.3 
+            }}
+          >
+            {badgeContent}
+          </motion.div>
+        </AnimatePresence>
+      );
+    }
+
+    return badgeContent;
   };
 
   if (isLoading) {
@@ -332,7 +356,7 @@ const AdminCustomOrders = () => {
                     >
                       <SelectTrigger className="w-auto min-w-[160px] h-auto border-0 bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:ml-1 [&>svg]:h-4 [&>svg]:w-4 [&>svg]:opacity-50">
                         <SelectValue>
-                          {getStatusBadge(request.status, true)}
+                          {getStatusBadge(request.status, true, true)}
                         </SelectValue>
                       </SelectTrigger>
                       <SelectContent className="bg-card/95 backdrop-blur-xl border border-border/50 rounded-xl p-2 min-w-[200px] shadow-2xl">

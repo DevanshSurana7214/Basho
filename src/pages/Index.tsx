@@ -4,8 +4,9 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navigation from "@/components/Navigation";
 import ArrivalSection from "@/components/home/ArrivalSection";
+import { HeroScrollZoom } from "@/components/home/HeroScrollZoom";
+import { SmoothScrollProvider } from "@/components/home/SmoothScroll";
 import CulturalGroundingSection from "@/components/home/CulturalGroundingSection";
-import CraftStepsSection from "@/components/home/CraftStepsSection";
 import TexturesGridSection from "@/components/home/TexturesGridSection";
 import ProductsShowcaseSection from "@/components/home/ProductsShowcaseSection";
 import ExperiencesSection from "@/components/home/ExperiencesSection";
@@ -83,19 +84,20 @@ const Index = () => {
         )}
       </AnimatePresence>
       
-      <div className="min-h-screen">
-        <Navigation />
-        <main>
-          {/* Section 1: Arrival - First Impression */}
-          <ArrivalSection />
+      <SmoothScrollProvider>
+        <div className="min-h-screen">
+          <Navigation />
+          <main>
+            {/* Section 1: Arrival - First Impression */}
+            <ArrivalSection />
+            
+            {/* Section 1.5: Hero Scroll Zoom - Cinematic Image Sequence */}
+            <HeroScrollZoom />
+            
+            {/* Section 2: Cultural Grounding - Philosophy */}
+            <CulturalGroundingSection />
           
-          {/* Section 2: Cultural Grounding - Philosophy */}
-          <CulturalGroundingSection />
-          
-          {/* Section 3: Craft Process - Shaping, Drying, Glazing, Firing */}
-          <CraftStepsSection />
-          
-          {/* Section 4: Textures & Materials - Sensory Grid */}
+          {/* Section 3: Textures & Materials - Sensory Grid */}
           <TexturesGridSection />
           
           {/* Section 5: Products as Outcome - Editorial Layout */}
@@ -106,10 +108,11 @@ const Index = () => {
           
           {/* Section 7: Trust & Social Proof - Testimonials, Studio */}
           <TrustSection />
-        </main>
-        <Footer />
-        <ChatWidget />
-      </div>
+          </main>
+          <Footer />
+          <ChatWidget />
+        </div>
+      </SmoothScrollProvider>
     </>
   );
 };

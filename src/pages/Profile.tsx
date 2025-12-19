@@ -127,6 +127,9 @@ export default function Profile() {
     return email?.charAt(0).toUpperCase() || 'U';
   };
 
+  // Get avatar URL from Google OAuth or other providers
+  const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+
   return (
     <>
       <Helmet>
@@ -153,11 +156,22 @@ export default function Profile() {
               className="text-center"
             >
               {/* Avatar */}
-              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border-2 border-primary/30 mb-6">
-                <span className="font-serif text-3xl text-primary">
-                  {getInitials(profile?.full_name, user?.email)}
-                </span>
-              </div>
+              {avatarUrl ? (
+                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-primary/30 mb-6">
+                  <img 
+                    src={avatarUrl} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+              ) : (
+                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border-2 border-primary/30 mb-6">
+                  <span className="font-serif text-3xl text-primary">
+                    {getInitials(profile?.full_name, user?.email)}
+                  </span>
+                </div>
+              )}
 
               <h1 className="font-serif text-4xl md:text-5xl text-foreground mb-3">
                 {profile?.full_name || 'Welcome'}

@@ -248,16 +248,21 @@ const VirtualTourGallery = () => {
               {tourImages.map((_, index) => (
                 <button
                   key={index}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    index === selectedIndex 
-                      ? "bg-white w-6" 
-                      : "bg-white/40 hover:bg-white/60"
-                  }`}
+                  className="relative w-2 h-2 rounded-full bg-white/40 hover:bg-white/60 transition-colors"
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedIndex(index);
                   }}
-                />
+                >
+                  {index === selectedIndex && (
+                    <motion.div
+                      layoutId="activeDot"
+                      className="absolute inset-0 bg-white rounded-full"
+                      style={{ width: 24, left: -8 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                </button>
               ))}
             </div>
 

@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { Calendar, Clock, Users, Heart, Cake, TreePine, Palette, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -108,6 +109,7 @@ const ExperienceCard = ({ experience, index }: { experience: Experience; index: 
 
   return (
     <motion.div
+      id={experience.id}
       ref={ref}
       initial={{ opacity: 0, y: 40 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -515,6 +517,21 @@ const BookingSection = () => {
 const Experiences = () => {
   const heroRef = useRef(null);
   const isHeroInView = useInView(heroRef, { once: true });
+  const location = useLocation();
+
+  // Scroll to section if hash is present (e.g., /experiences#studio)
+  useEffect(() => {
+    if (location.hash) {
+      const targetId = location.hash.replace('#', '');
+      // Small delay to ensure DOM is rendered
+      setTimeout(() => {
+        const element = document.getElementById(targetId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  }, [location.hash]);
 
   return (
     <>

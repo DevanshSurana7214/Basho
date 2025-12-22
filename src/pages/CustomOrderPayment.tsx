@@ -107,7 +107,7 @@ export default function CustomOrderPayment() {
         key: data.keyId,
         amount: data.amount,
         currency: data.currency,
-        name: 'Basho by Shivangi',
+        name: 'Basho Byy Shivangi',
         description: `Custom Pottery Order`,
         order_id: data.orderId,
         handler: async function (response: any) {

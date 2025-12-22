@@ -1,18 +1,25 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet-async";
+import { Camera, Film, Palette, Quote, Play, Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { X, Play, Quote, ChevronLeft, ChevronRight, Upload, Loader2, Pause } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import { useAdmin } from "@/hooks/useAdmin";
+import MediaMasonryGrid from "@/components/media/MediaMasonryGrid";
+import MediaLightbox from "@/components/media/MediaLightbox";
+import type { MediaItem } from "@/components/media/MediaGalleryTile";
+
+interface VideoTestimonial {
+  id: string;
+  title: string;
+  description: string | null;
+  video_url: string;
+  thumbnail_url: string | null;
+  customer_name: string | null;
+  experience_type: string | null;
+  is_featured: boolean | null;
+}
 
 // Product Gallery Images
 import workshopPieces1 from "@/assets/gallery/workshop-pieces-1.png";
@@ -50,625 +57,458 @@ import potteryGlazing from "@/assets/studio/pottery-glazing.jpg";
 import potteryTools from "@/assets/studio/pottery-tools.jpg";
 import rawClayTexture from "@/assets/studio/raw-clay-texture.jpg";
 
-interface GalleryImage {
-  src: string;
-  alt: string;
-  category: "products" | "workshops" | "studio";
-}
+// Workshop Instagram videos
+const workshopVideo1 = "/video/workshop-1.mp4";
+const workshopVideo2 = "/video/workshop-2.mp4";
 
-interface VideoTestimonial {
-  id: string;
-  title: string;
-  description: string | null;
-  video_url: string;
-  thumbnail_url: string | null;
-  duration_seconds: number | null;
-  customer_name: string | null;
-  experience_type: string | null;
-}
-
-const galleryImages: GalleryImage[] = [
-  // Products
-  { src: workshopPieces1, alt: "Blue striped ceramic mugs and tray set", category: "products" },
-  { src: workshopPieces2, alt: "Yellow striped pottery with palm tree design", category: "products" },
-  { src: workshopPieces3, alt: "Pastel ceramic pitchers gift set", category: "products" },
-  { src: workshopPieces4, alt: "Terracotta and cream stacking bowls", category: "products" },
-  { src: workshopPieces5, alt: "Two-tone ceramic plates with hands", category: "products" },
-  { src: workshopPieces6, alt: "Pink and green glazed dinnerware set", category: "products" },
-  { src: workshopPieces7, alt: "Terracotta bowl with green interior", category: "products" },
-  { src: workshopPieces8, alt: "Ceramic grater plates with garlic", category: "products" },
-  { src: workshopPieces9, alt: "Olive green ceramic bowl and plate set", category: "products" },
-  { src: workshopPieces10, alt: "Blue and pink chip and dip platter", category: "products" },
-  { src: workshopPieces11, alt: "Turquoise and pink glazed ceramic trays gift set", category: "products" },
-  { src: workshopPieces12, alt: "Rustic terracotta salt and pepper shakers with cork", category: "products" },
-  { src: workshopPieces13, alt: "Ceramic tic-tac-toe game boards with heart pieces", category: "products" },
-  { src: workshopPieces14, alt: "White ceramic mug with red lips design", category: "products" },
-  { src: workshopPieces15, alt: "Ceramic plates with lips design in wicker basket", category: "products" },
-  { src: workshopPieces16, alt: "White ceramic planter with saucer and plant", category: "products" },
-  { src: workshopPieces17, alt: "Minimalist cream stoneware plate", category: "products" },
-  { src: workshopPieces18, alt: "Ceramic pitcher vase with sunflowers", category: "products" },
-  { src: workshopPieces21, alt: "Abstract terracotta figure sculptures", category: "products" },
-  { src: workshopPieces22, alt: "Heart-shaped bowls with red heart accents", category: "products" },
-  // Workshops
-  { src: beginnerPottery, alt: "Beginner learning pottery on the wheel", category: "workshops" },
-  { src: couplePottery, alt: "Couple enjoying a pottery date experience", category: "workshops" },
-  { src: kidsClayPlay, alt: "Children exploring clay in a creative session", category: "workshops" },
-  { src: masterClass, alt: "Master potter demonstrating advanced techniques", category: "workshops" },
-  // Studio
-  { src: studioInterior, alt: "Inside the pottery studio workspace", category: "studio" },
-  { src: kiln, alt: "Ceramic kiln ready for firing", category: "studio" },
-  { src: potteryDrying, alt: "Pottery pieces drying on shelves", category: "studio" },
-  { src: potteryGlazing, alt: "Glazing process on ceramic pieces", category: "studio" },
-  { src: potteryTools, alt: "Traditional pottery tools and equipment", category: "studio" },
-  { src: rawClayTexture, alt: "Raw clay texture and material", category: "studio" },
+// ===== MEDIA DATA =====
+const productGallery: MediaItem[] = [
+  { id: "p1", type: "image", src: workshopPieces1, alt: "Blue striped mugs and tray", category: "product", aspectRatio: "1:1" },
+  { id: "p2", type: "image", src: workshopPieces2, alt: "Yellow pottery with palm design", category: "product", aspectRatio: "1:1" },
+  { id: "p3", type: "image", src: workshopPieces3, alt: "Pastel ceramic pitchers", category: "product", aspectRatio: "4:5" },
+  { id: "p4", type: "image", src: workshopPieces4, alt: "Terracotta stacking bowls", category: "product", aspectRatio: "1:1" },
+  { id: "p5", type: "image", src: workshopPieces5, alt: "Two-tone ceramic plates", category: "product", aspectRatio: "4:5" },
+  { id: "p6", type: "image", src: workshopPieces6, alt: "Pink and green dinnerware", category: "product", aspectRatio: "1:1" },
+  { id: "p7", type: "image", src: workshopPieces7, alt: "Terracotta bowl with green interior", category: "product", aspectRatio: "1:1" },
+  { id: "p8", type: "image", src: workshopPieces8, alt: "Ceramic grater plates", category: "product", aspectRatio: "4:5" },
+  { id: "p9", type: "image", src: workshopPieces9, alt: "Olive green ceramic set", category: "product", aspectRatio: "1:1" },
+  { id: "p10", type: "image", src: workshopPieces10, alt: "Blue and pink chip platter", category: "product", aspectRatio: "4:5" },
+  { id: "p11", type: "image", src: workshopPieces11, alt: "Glazed ceramic trays", category: "product", aspectRatio: "1:1" },
+  { id: "p12", type: "image", src: workshopPieces12, alt: "Salt and pepper shakers", category: "product", aspectRatio: "1:1" },
+  { id: "p13", type: "image", src: workshopPieces13, alt: "Ceramic tic-tac-toe", category: "product", aspectRatio: "1:1" },
+  { id: "p14", type: "image", src: workshopPieces14, alt: "Mug with lips design", category: "product", aspectRatio: "4:5" },
+  { id: "p15", type: "image", src: workshopPieces15, alt: "Plates in wicker basket", category: "product", aspectRatio: "1:1" },
+  { id: "p16", type: "image", src: workshopPieces16, alt: "White ceramic planter", category: "product", aspectRatio: "4:5" },
+  { id: "p17", type: "image", src: workshopPieces17, alt: "Minimalist stoneware plate", category: "product", aspectRatio: "1:1" },
+  { id: "p18", type: "image", src: workshopPieces18, alt: "Pitcher with sunflowers", category: "product", aspectRatio: "4:5" },
+  { id: "p19", type: "image", src: workshopPieces21, alt: "Terracotta figure sculptures", category: "product", aspectRatio: "1:1" },
+  { id: "p20", type: "image", src: workshopPieces22, alt: "Heart-shaped bowls", category: "product", aspectRatio: "1:1" },
 ];
 
-const testimonials = [
+const workshopMoments: MediaItem[] = [
+  { id: "w1", type: "image", src: beginnerPottery, alt: "Hands gently shaping clay on the wheel", category: "workshop", aspectRatio: "4:5" },
+  { id: "w2", type: "video", src: workshopVideo1, alt: "Workshop participant centering clay", category: "workshop", aspectRatio: "9:16" },
+  { id: "w3", type: "image", src: couplePottery, alt: "Couple sharing a quiet moment at the wheel", category: "workshop", aspectRatio: "1:1" },
+  { id: "w4", type: "image", src: masterClass, alt: "Instructor guiding student's hands", category: "workshop", aspectRatio: "4:5" },
+  { id: "w5", type: "image", src: kidsClayPlay, alt: "Child discovering the joy of clay", category: "workshop", aspectRatio: "1:1" },
+  { id: "w6", type: "video", src: workshopVideo2, alt: "Focused concentration during throwing", category: "workshop", aspectRatio: "9:16" },
+];
+
+const studioEvents: MediaItem[] = [
+  { id: "s1", type: "image", src: studioInterior, alt: "The studio in morning light", category: "studio", aspectRatio: "16:9" },
+  { id: "s2", type: "image", src: kiln, alt: "Kiln awaiting its next firing", category: "studio", aspectRatio: "1:1" },
+  { id: "s3", type: "image", src: potteryDrying, alt: "Pieces drying on wooden shelves", category: "studio", aspectRatio: "4:5" },
+  { id: "s4", type: "image", src: potteryGlazing, alt: "Glazing in progress", category: "studio", aspectRatio: "4:5" },
+  { id: "s5", type: "image", src: potteryTools, alt: "Traditional pottery tools", category: "studio", aspectRatio: "16:9" },
+  { id: "s6", type: "image", src: rawClayTexture, alt: "Raw clay texture", category: "studio", aspectRatio: "1:1" },
+];
+
+// Fallback testimonials (text-based)
+const fallbackTestimonials = [
   {
     quote: "The experience felt grounding and thoughtful. I left with more than a pot—I left with a memory.",
-    context: "Studio Experience",
     name: "Ananya",
+    context: "Studio Experience",
   },
   {
     quote: "Every piece tells a story. The mugs we bought have become our morning ritual.",
-    context: "Tableware Collection",
     name: "Rahul & Priya",
+    context: "Tableware Collection",
   },
   {
     quote: "The workshop was meditative. My daughter and I finally found something we both love.",
-    context: "Family Workshop",
     name: "Meera",
+    context: "Family Workshop",
   },
   {
     quote: "I've gifted their pottery to three friends now. Each time, the reaction is pure joy.",
-    context: "Gift Purchase",
     name: "Vikram",
+    context: "Gift Purchase",
   },
   {
     quote: "The attention to detail is remarkable. You can feel the care in every curve.",
-    context: "Custom Order",
     name: "Sanjana",
-  },
-  {
-    quote: "We chose Mitti Mahal for our corporate gifts. Our clients loved the personal touch.",
-    context: "Corporate Gifting",
-    name: "Arjun",
+    context: "Custom Order",
   },
 ];
 
-const customerStories = [
-  {
-    title: "A Birthday That Became a Tradition",
-    story: "Maya booked a wheel-throwing session for her partner's birthday. What started as a one-time experience has become their annual ritual—three years and counting.",
-    type: "Couple's Experience",
-  },
-  {
-    title: "Finding Calm in Clay",
-    story: "After months of burnout, Rohan signed up for a beginner's workshop. He describes that first hour with clay as 'the first time my mind went quiet in years.'",
-    type: "Solo Workshop",
-  },
-  {
-    title: "A Table Set with Meaning",
-    story: "When Kavitha moved into her new home, she wanted tableware that felt intentional. Her custom set of six plates and bowls now hosts every family dinner.",
-    type: "Custom Order",
-  },
-  {
-    title: "Team Building, Reimagined",
-    story: "A startup of 12 people came for a team day. They left with handmade planters and a shared experience that still comes up in meetings months later.",
-    type: "Corporate Event",
-  },
-];
+type GalleryCategory = "all" | "products" | "workshops" | "studio";
 
-const categories = [
-  { id: "all", label: "All" },
-  { id: "products", label: "Products" },
-  { id: "workshops", label: "Workshops" },
-  { id: "studio", label: "Studio & Events" },
+const categoryConfig: { id: GalleryCategory; label: string; icon: React.ElementType }[] = [
+  { id: "all", label: "All", icon: Camera },
+  { id: "products", label: "Products", icon: Palette },
+  { id: "workshops", label: "Workshops", icon: Film },
+  { id: "studio", label: "Studio", icon: Camera },
 ];
 
 const Media = () => {
-  const { user } = useAuth();
-  const { isAdmin } = useAdmin();
-  const [activeCategory, setActiveCategory] = useState<string>("all");
-  const [lightboxImage, setLightboxImage] = useState<GalleryImage | null>(null);
-  const [lightboxIndex, setLightboxIndex] = useState<number>(0);
-  const [videoTestimonials, setVideoTestimonials] = useState<VideoTestimonial[]>([]);
-  const [isLoadingVideos, setIsLoadingVideos] = useState(true);
-  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
-  
-  // Upload state
-  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadForm, setUploadForm] = useState({
-    title: "",
-    description: "",
-    customerName: "",
-    experienceType: "",
+  const [lightboxItem, setLightboxItem] = useState<MediaItem | null>(null);
+  const [activeCategory, setActiveCategory] = useState<GalleryCategory>("all");
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Fetch video testimonials from Supabase
+  const { data: videoTestimonials, isLoading: testimonialsLoading } = useQuery({
+    queryKey: ['approved-video-testimonials'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('video_testimonials')
+        .select('*')
+        .eq('is_approved', true)
+        .order('is_featured', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as VideoTestimonial[];
+    },
   });
-  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const filteredImages = activeCategory === "all" 
-    ? galleryImages 
-    : galleryImages.filter(img => img.category === activeCategory);
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+  const [showFloatingFilter, setShowFloatingFilter] = useState(false);
 
-  // Fetch video testimonials
   useEffect(() => {
-    const fetchVideos = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('video_testimonials')
-          .select('*')
-          .eq('is_approved', true)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        setVideoTestimonials(data || []);
-      } catch (error) {
-        console.error('Error fetching video testimonials:', error);
-      } finally {
-        setIsLoadingVideos(false);
-      }
-    };
-
-    fetchVideos();
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const openLightbox = (image: GalleryImage, index: number) => {
-    setLightboxImage(image);
-    setLightboxIndex(index);
-    document.body.style.overflow = "hidden";
-  };
-
-  const closeLightbox = () => {
-    setLightboxImage(null);
-    document.body.style.overflow = "auto";
-  };
-
-  const navigateLightbox = (direction: "prev" | "next") => {
-    const newIndex = direction === "prev" 
-      ? (lightboxIndex - 1 + filteredImages.length) % filteredImages.length
-      : (lightboxIndex + 1) % filteredImages.length;
-    setLightboxIndex(newIndex);
-    setLightboxImage(filteredImages[newIndex]);
-  };
-
-  const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 50 * 1024 * 1024) {
-        toast.error("Video must be under 50MB");
-        return;
-      }
-      if (!['video/mp4', 'video/webm', 'video/quicktime'].includes(file.type)) {
-        toast.error("Only MP4, WebM, or MOV formats allowed");
-        return;
-      }
-      setSelectedVideo(file);
-    }
-  };
-
-  const handleUploadSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Scroll detection for floating filter
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
     
-    if (!user) {
-      toast.error("Please sign in to upload a video");
-      return;
-    }
-
-    if (!selectedVideo) {
-      toast.error("Please select a video");
-      return;
-    }
-
-    if (!uploadForm.title.trim()) {
-      toast.error("Please enter a title");
-      return;
-    }
-
-    setIsUploading(true);
-
-    try {
-      // Upload video to storage
-      const fileExt = selectedVideo.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollThreshold = 400; // Show floating filter after scrolling past this point
       
-      const { error: uploadError } = await supabase.storage
-        .from('video-testimonials')
-        .upload(fileName, selectedVideo);
+      if (currentScrollY > scrollThreshold) {
+        if (currentScrollY < lastScrollY - 5) {
+          // Scrolling up - show floating filter at bottom
+          setShowFloatingFilter(true);
+        } else if (currentScrollY > lastScrollY + 5) {
+          // Scrolling down - hide floating filter
+          setShowFloatingFilter(false);
+        }
+      } else {
+        // Near top - hide floating filter
+        setShowFloatingFilter(false);
+      }
+      
+      lastScrollY = currentScrollY;
+    };
 
-      if (uploadError) throw uploadError;
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('video-testimonials')
-        .getPublicUrl(fileName);
-
-      // Insert record
-      const { error: insertError } = await supabase
-        .from('video_testimonials')
-        .insert({
-          title: uploadForm.title.trim(),
-          description: uploadForm.description.trim() || null,
-          video_url: publicUrl,
-          customer_name: uploadForm.customerName.trim() || null,
-          experience_type: uploadForm.experienceType.trim() || null,
-          uploaded_by: user.id,
-          is_approved: false,
-        });
-
-      if (insertError) throw insertError;
-
-      toast.success("Video uploaded successfully! It will appear after admin approval.");
-      setIsUploadDialogOpen(false);
-      setUploadForm({ title: "", description: "", customerName: "", experienceType: "" });
-      setSelectedVideo(null);
-    } catch (error: any) {
-      console.error('Upload error:', error);
-      toast.error(error.message || "Failed to upload video");
-    } finally {
-      setIsUploading(false);
+  const filteredItems = useMemo(() => {
+    const allItems = [...productGallery, ...workshopMoments, ...studioEvents];
+    
+    if (activeCategory === "all") {
+      return isMobile ? allItems.filter(i => i.type === "image").slice(0, 12) : allItems;
     }
-  };
+    
+    const categoryMap: Record<GalleryCategory, MediaItem[]> = {
+      all: allItems,
+      products: productGallery,
+      workshops: workshopMoments,
+      studio: studioEvents,
+    };
+    
+    const items = categoryMap[activeCategory];
+    return isMobile ? items.filter(i => i.type === "image").slice(0, 8) : items;
+  }, [activeCategory, isMobile]);
 
-  const toggleVideoPlay = (videoId: string) => {
-    if (playingVideoId === videoId) {
-      setPlayingVideoId(null);
-    } else {
-      setPlayingVideoId(videoId);
-    }
-  };
+  const openLightbox = (item: MediaItem) => setLightboxItem(item);
+  const closeLightbox = () => setLightboxItem(null);
 
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Gallery & Stories | Mitti Mahal</title>
-        <meta name="description" content="Explore moments from our studio, workshops, and experiences. Real craft, real people, real stories." />
+        <title>Gallery | Basho by Shivangi</title>
+        <meta 
+          name="description" 
+          content="Explore our gallery of handcrafted pottery, workshop moments, and studio life. A visual journey through craft and creativity." 
+        />
       </Helmet>
 
       <Navigation />
 
-      <main className="pt-24">
-        {/* Hero Section */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl mx-auto"
-          >
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl text-foreground mb-6">
-              Craft in practice.
-            </h1>
-            <p className="text-lg text-muted-foreground font-light">
-              Moments from the studio, workshops, and experiences.
-            </p>
-          </motion.div>
-        </section>
-
-        {/* Gallery Section */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            {/* Category Filter */}
-            <motion.div 
+      <main>
+        {/* ===== ELEGANT TEXT HEADER ===== */}
+        <section className="pt-32 pb-16 md:pt-40 md:pb-24 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex flex-wrap justify-center gap-3 mb-12"
+              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
             >
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                    activeCategory === cat.id
-                      ? "bg-primary text-primary-foreground shadow-lg"
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              ))}
-            </motion.div>
-
-            {/* Masonry Grid */}
-            <motion.div 
-              layout
-              className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4"
-            >
-              <AnimatePresence mode="popLayout">
-                {filteredImages.map((image, index) => (
-                  <motion.div
-                    key={image.src}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.4, delay: index * 0.05 }}
-                    className="break-inside-avoid group cursor-pointer"
-                    onClick={() => openLightbox(image, index)}
-                  >
-                    <div className="relative overflow-hidden rounded-xl bg-muted">
-                      <img
-                        src={image.src}
-                        alt={image.alt}
-                        className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="absolute bottom-4 left-4 right-4">
-                          <p className="text-sm text-foreground/90 font-medium">
-                            {image.alt}
-                          </p>
-                          <span className="text-xs text-muted-foreground capitalize">
-                            {image.category === "studio" ? "Studio & Events" : image.category}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+              <span className="inline-block text-terracotta text-sm tracking-[0.25em] uppercase font-sans mb-4">
+                Our Gallery
+              </span>
+              <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground font-light tracking-tight">
+                Craft in Practice
+              </h1>
+              <p className="mt-6 text-muted-foreground text-lg md:text-xl font-light max-w-2xl mx-auto leading-relaxed">
+                A visual journey through our studio, workshops, and the pieces that emerge from earth and intention.
+              </p>
+              <div className="mt-8 flex justify-center">
+                <div className="w-24 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+              </div>
             </motion.div>
           </div>
         </section>
 
-        {/* Testimonials Section */}
-        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-muted/30">
-          <div className="max-w-7xl mx-auto">
+        {/* ===== INLINE CATEGORY FILTER TABS ===== */}
+        <section className="py-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-center">
+              <div className="inline-flex gap-2 p-1.5 bg-parchment/90 backdrop-blur-sm rounded-full border border-border/40 shadow-sm">
+                {categoryConfig.map((cat) => {
+                  const Icon = cat.icon;
+                  const isActive = activeCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setActiveCategory(cat.id)}
+                      className={`
+                        flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
+                        transition-all duration-300 ease-out
+                        ${isActive 
+                          ? "bg-primary text-primary-foreground shadow-sm" 
+                          : "text-foreground/70 hover:text-foreground hover:bg-muted/50"
+                        }
+                      `}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{cat.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== FLOATING CATEGORY FILTER (appears on scroll up) ===== */}
+        <AnimatePresence>
+          {showFloatingFilter && (
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+              className="fixed bottom-6 left-0 right-0 z-30"
+            >
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-center">
+                  <div className="inline-flex gap-2 p-1.5 bg-parchment/95 backdrop-blur-md rounded-full border border-border/40 shadow-lg">
+                    {categoryConfig.map((cat) => {
+                      const Icon = cat.icon;
+                      const isActive = activeCategory === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => setActiveCategory(cat.id)}
+                          className={`
+                            flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
+                            transition-all duration-300 ease-out
+                            ${isActive 
+                              ? "bg-primary text-primary-foreground shadow-sm" 
+                              : "text-foreground/70 hover:text-foreground hover:bg-muted/50"
+                            }
+                          `}
+                        >
+                          <Icon className="w-4 h-4" />
+                          <span>{cat.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ===== PHOTO GALLERY GRID ===== */}
+        <section className="py-12 md:py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeCategory}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.4 }}
+              >
+                <MediaMasonryGrid
+                  items={filteredItems}
+                  onItemClick={openLightbox}
+                  columns={activeCategory === "studio" ? 2 : 3}
+                  maxConcurrentVideos={2}
+                />
+              </motion.div>
+            </AnimatePresence>
+            
+            {/* Item count */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-center text-muted-foreground/60 text-sm mt-12"
+            >
+              Showing {filteredItems.length} {filteredItems.length === 1 ? 'piece' : 'pieces'}
+            </motion.p>
+          </div>
+        </section>
+
+        {/* ===== UNIFIED TESTIMONIALS SECTION ===== */}
+        <section className="py-24 md:py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-muted/30 via-muted/20 to-background">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.8 }}
               className="text-center mb-16"
             >
-              <h2 className="font-display text-4xl sm:text-5xl text-foreground mb-4">
-                What people say
+              <span className="inline-flex items-center gap-2 text-terracotta text-sm tracking-[0.2em] uppercase font-sans mb-4">
+                <Quote className="w-4 h-4" />
+                Voices
+              </span>
+              <h2 className="font-serif text-3xl md:text-4xl text-foreground font-light">
+                What Our Community Says
               </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                Real words from real experiences.
-              </p>
+              <div className="w-16 h-px bg-gradient-to-r from-transparent via-border to-transparent mt-6 mx-auto" />
             </motion.div>
 
-            {/* Text Testimonials Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
-              {testimonials.map((testimonial, index) => (
+            {/* Combined Grid - Videos + Text */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Video Testimonials */}
+              {videoTestimonials && videoTestimonials.map((video, index) => (
                 <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
+                  key={video.id}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
-                  className="bg-background rounded-2xl p-8 shadow-sm border border-border/50 hover:shadow-md transition-shadow duration-300"
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className={`relative rounded-2xl overflow-hidden bg-card border border-border/30 group ${
+                    video.is_featured ? 'lg:row-span-2' : ''
+                  }`}
                 >
-                  <Quote className="w-8 h-8 text-primary/30 mb-4" />
-                  <p className="text-foreground font-medium mb-4 leading-relaxed">
-                    "{testimonial.quote}"
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      {testimonial.name}
-                    </span>
-                    <span className="text-xs text-primary/70 bg-primary/10 px-3 py-1 rounded-full">
-                      {testimonial.context}
-                    </span>
+                  <div className={`relative ${video.is_featured ? 'aspect-[9/16] lg:aspect-auto lg:h-full' : 'aspect-video'}`}>
+                    {playingVideoId === video.id ? (
+                      <video
+                        src={video.video_url}
+                        controls
+                        autoPlay
+                        className="w-full h-full object-cover"
+                        onEnded={() => setPlayingVideoId(null)}
+                      />
+                    ) : (
+                      <>
+                        {video.thumbnail_url ? (
+                          <img
+                            src={video.thumbnail_url}
+                            alt={video.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                            <Film className="w-12 h-12 text-muted-foreground/40" />
+                          </div>
+                        )}
+                        <button
+                          onClick={() => setPlayingVideoId(video.id)}
+                          className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors"
+                        >
+                          <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                            <Play className="w-5 h-5 text-primary ml-0.5" fill="currentColor" />
+                          </div>
+                        </button>
+                      </>
+                    )}
+                    {video.is_featured && (
+                      <span className="absolute top-3 left-3 px-2 py-1 bg-terracotta text-white text-xs font-medium rounded-full">
+                        Featured
+                      </span>
+                    )}
+                    {/* Video info overlay at bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                      <h3 className="font-medium text-white text-sm">{video.title}</h3>
+                      {video.customer_name && (
+                        <p className="text-xs text-white/70 mt-1">
+                          {video.customer_name}
+                          {video.experience_type && (
+                            <span className="text-white/50"> · {video.experience_type}</span>
+                          )}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               ))}
+
+              {/* Text Testimonials */}
+              {fallbackTestimonials.slice(0, videoTestimonials && videoTestimonials.length > 0 ? 3 : 4).map((testimonial, index) => (
+                <motion.blockquote
+                  key={`text-${index}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.6, delay: (videoTestimonials?.length || 0) * 0.1 + index * 0.1 }}
+                  className="relative p-6 bg-card/50 rounded-2xl border border-border/30 group hover:border-border/50 transition-colors duration-300 flex flex-col justify-between"
+                >
+                  {/* Quote mark */}
+                  <div>
+                    <span className="font-serif text-4xl text-terracotta/20 leading-none block mb-2">
+                      "
+                    </span>
+                    <p className="font-serif text-base text-foreground/90 font-light leading-relaxed italic">
+                      {testimonial.quote}
+                    </p>
+                  </div>
+                  <footer className="mt-4 flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+                      <span className="text-sm font-medium text-muted-foreground">
+                        {testimonial.name.charAt(0)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-foreground block">
+                        {testimonial.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {testimonial.context}
+                      </span>
+                    </div>
+                  </footer>
+                </motion.blockquote>
+              ))}
             </div>
 
-            {/* Video Testimonials */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
+            {/* Featured text testimonial */}
+            <motion.blockquote
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="mb-20"
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="mt-16 text-center max-w-2xl mx-auto"
             >
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="font-display text-2xl text-foreground">
-                  Moments captured
-                </h3>
-                {isAdmin && (
-                  <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
-                        <Upload className="w-4 h-4" />
-                        Share Your Story
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Share Your Experience</DialogTitle>
-                      </DialogHeader>
-                      <form onSubmit={handleUploadSubmit} className="space-y-4 mt-4">
-                        <div>
-                          <Label htmlFor="video">Video (max 50MB)</Label>
-                          <input
-                            ref={fileInputRef}
-                            type="file"
-                            id="video"
-                            accept="video/mp4,video/webm,video/quicktime"
-                            onChange={handleVideoSelect}
-                            className="hidden"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="w-full mt-1"
-                            onClick={() => fileInputRef.current?.click()}
-                          >
-                            {selectedVideo ? selectedVideo.name : "Select Video"}
-                          </Button>
-                        </div>
-                        <div>
-                          <Label htmlFor="title">Title *</Label>
-                          <Input
-                            id="title"
-                            value={uploadForm.title}
-                            onChange={(e) => setUploadForm(prev => ({ ...prev, title: e.target.value }))}
-                            placeholder="My pottery experience"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="description">Description</Label>
-                          <Textarea
-                            id="description"
-                            value={uploadForm.description}
-                            onChange={(e) => setUploadForm(prev => ({ ...prev, description: e.target.value }))}
-                            placeholder="Tell us about your experience..."
-                            rows={3}
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="customerName">Your Name</Label>
-                            <Input
-                              id="customerName"
-                              value={uploadForm.customerName}
-                              onChange={(e) => setUploadForm(prev => ({ ...prev, customerName: e.target.value }))}
-                              placeholder="Optional"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="experienceType">Experience Type</Label>
-                            <Input
-                              id="experienceType"
-                              value={uploadForm.experienceType}
-                              onChange={(e) => setUploadForm(prev => ({ ...prev, experienceType: e.target.value }))}
-                              placeholder="e.g., Workshop"
-                            />
-                          </div>
-                        </div>
-                        <Button type="submit" className="w-full" disabled={isUploading}>
-                          {isUploading ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Uploading...
-                            </>
-                          ) : (
-                            "Submit for Review"
-                          )}
-                        </Button>
-                        <p className="text-xs text-muted-foreground text-center">
-                          Videos are reviewed before appearing on the page.
-                        </p>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                )}
-              </div>
-
-              {isLoadingVideos ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-                </div>
-              ) : videoTestimonials.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {videoTestimonials.map((video) => (
-                    <motion.div
-                      key={video.id}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      className="relative aspect-video rounded-2xl overflow-hidden bg-muted group"
-                    >
-                      {playingVideoId === video.id ? (
-                        <video
-                          src={video.video_url}
-                          className="w-full h-full object-cover"
-                          autoPlay
-                          controls
-                          onEnded={() => setPlayingVideoId(null)}
-                        />
-                      ) : (
-                        <>
-                          {video.thumbnail_url ? (
-                            <img
-                              src={video.thumbnail_url}
-                              alt={video.title}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <video
-                              src={video.video_url}
-                              className="w-full h-full object-cover"
-                              muted
-                              preload="metadata"
-                            />
-                          )}
-                          <div 
-                            className="absolute inset-0 bg-background/40 flex items-center justify-center cursor-pointer group-hover:bg-background/30 transition-colors duration-300"
-                            onClick={() => toggleVideoPlay(video.id)}
-                          >
-                            <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                              <Play className="w-6 h-6 text-primary-foreground ml-1" />
-                            </div>
-                          </div>
-                          <div className="absolute bottom-4 left-4 right-4">
-                            <p className="text-foreground text-sm font-medium">
-                              {video.title}
-                            </p>
-                            {video.customer_name && (
-                              <span className="text-foreground/70 text-xs">
-                                {video.customer_name}
-                                {video.experience_type && ` • ${video.experience_type}`}
-                              </span>
-                            )}
-                          </div>
-                        </>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 bg-background/50 rounded-2xl border border-border/30">
-                  <Play className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
-                  <p className="text-muted-foreground">No video testimonials yet.</p>
-                  {isAdmin && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Upload a video to share customer stories!
-                    </p>
-                  )}
-                </div>
-              )}
-            </motion.div>
-
-            {/* Customer Stories */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <h3 className="font-display text-2xl text-foreground text-center mb-10">
-                Stories that stay
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                {customerStories.map((story, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.15, duration: 0.5 }}
-                    className="relative p-8 rounded-2xl bg-gradient-to-br from-background to-muted/30 border border-border/30"
-                  >
-                    <span className="inline-block text-xs text-primary bg-primary/10 px-3 py-1 rounded-full mb-4">
-                      {story.type}
-                    </span>
-                    <h4 className="font-display text-xl text-foreground mb-3">
-                      {story.title}
-                    </h4>
-                    <p className="text-muted-foreground leading-relaxed text-sm">
-                      {story.story}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+              <span className="font-serif text-4xl text-terracotta/30">"</span>
+              <p className="font-serif text-2xl md:text-3xl text-foreground font-light leading-relaxed italic -mt-4">
+                {fallbackTestimonials[4].quote}
+              </p>
+              <footer className="mt-6">
+                <span className="text-sm font-medium text-foreground">
+                  {fallbackTestimonials[4].name}
+                </span>
+                <span className="text-muted-foreground/40 mx-2">—</span>
+                <span className="text-sm text-muted-foreground italic">
+                  {fallbackTestimonials[4].context}
+                </span>
+              </footer>
+            </motion.blockquote>
           </div>
         </section>
       </main>
@@ -676,57 +516,7 @@ const Media = () => {
       <Footer />
 
       {/* Lightbox */}
-      <AnimatePresence>
-        {lightboxImage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-4"
-            onClick={closeLightbox}
-          >
-            <button
-              onClick={closeLightbox}
-              className="absolute top-6 right-6 p-2 rounded-full bg-muted/80 hover:bg-muted transition-colors z-10"
-            >
-              <X className="w-6 h-6 text-foreground" />
-            </button>
-
-            <button
-              onClick={(e) => { e.stopPropagation(); navigateLightbox("prev"); }}
-              className="absolute left-4 md:left-8 p-3 rounded-full bg-muted/80 hover:bg-muted transition-colors z-10"
-            >
-              <ChevronLeft className="w-6 h-6 text-foreground" />
-            </button>
-
-            <button
-              onClick={(e) => { e.stopPropagation(); navigateLightbox("next"); }}
-              className="absolute right-4 md:right-8 p-3 rounded-full bg-muted/80 hover:bg-muted transition-colors z-10"
-            >
-              <ChevronRight className="w-6 h-6 text-foreground" />
-            </button>
-
-            <motion.img
-              key={lightboxImage.src}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.3 }}
-              src={lightboxImage.src}
-              alt={lightboxImage.alt}
-              className="max-w-full max-h-[85vh] object-contain rounded-lg"
-              onClick={(e) => e.stopPropagation()}
-            />
-
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center">
-              <p className="text-foreground font-medium mb-1">{lightboxImage.alt}</p>
-              <span className="text-sm text-muted-foreground">
-                {lightboxIndex + 1} / {filteredImages.length}
-              </span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <MediaLightbox item={lightboxItem} onClose={closeLightbox} />
     </div>
   );
 };

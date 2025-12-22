@@ -26,3 +26,12 @@ verify_jwt = false
 
 [functions.verify-experience-payment]
 verify_jwt = false
+
+[functions.create-workshop-order]
+verify_jwt = false
+
+[functions.verify-workshop-payment]
+verify_jwt = false
+
+[functions.send-workshop-confirmation]
+verify_jwt = false

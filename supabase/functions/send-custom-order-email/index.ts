@@ -208,7 +208,8 @@ serve(async (req: Request): Promise<Response> => {
               
               <!-- Header -->
               <tr><td style="background-color: #292524; padding: 32px; text-align: center;">
-                <h1 style="font-family: Georgia, serif; color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px;">Basho By Shivangi</h1>
+                <img src="https://grdolasawzsrwuqhpheu.supabase.co/storage/v1/object/public/email-assets/logo-email.png" alt="Basho Byy Shivangi" style="max-width: 120px; height: auto; margin-bottom: 16px;" />
+                <h1 style="font-family: Georgia, serif; color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px;">Basho Byy Shivangi</h1>
                 <p style="color: #a8a29e; margin: 8px 0 0 0; font-size: 12px; letter-spacing: 3px; text-transform: uppercase;">Handcrafted Pottery</p>
               </td></tr>
               
@@ -228,8 +229,15 @@ serve(async (req: Request): Promise<Response> => {
               
               <!-- Footer -->
               <tr><td style="padding: 32px; text-align: center;">
-                <p style="color: #78716c; margin: 0 0 8px 0; font-size: 14px;">Made with love in our pottery studio</p>
-                <p style="color: #a8a29e; margin: 0; font-size: 12px;">© ${year} Basho By Shivangi. All rights reserved.</p>
+                <p style="color: #78716c; margin: 0 0 16px 0; font-size: 14px;">Made with love in our pottery studio</p>
+                <div style="margin-bottom: 16px;">
+                  <a href="https://instagram.com/bashobyyshivangi" target="_blank" style="display: inline-block; margin: 0 8px; color: #78716c; text-decoration: none; font-size: 14px;">Instagram</a>
+                  <span style="color: #a8a29e;">|</span>
+                  <a href="https://basho-by-shivangi.lovable.app" target="_blank" style="display: inline-block; margin: 0 8px; color: #78716c; text-decoration: none; font-size: 14px;">Website</a>
+                  <span style="color: #a8a29e;">|</span>
+                  <a href="mailto:hello@basho.in" style="display: inline-block; margin: 0 8px; color: #78716c; text-decoration: none; font-size: 14px;">Email Us</a>
+                </div>
+                <p style="color: #a8a29e; margin: 0; font-size: 12px;">© ${year} Basho Byy Shivangi. All rights reserved.</p>
               </td></tr>
             </table>
           </td></tr>

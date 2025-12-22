@@ -10,6 +10,7 @@ import ProductDetail from "@/pages/ProductDetail";
 import CustomOrders from "@/pages/CustomOrders";
 import CustomOrderPayment from "@/pages/CustomOrderPayment";
 import Workshops from "@/pages/Workshops";
+import WorkshopConfirmation from "@/pages/WorkshopConfirmation";
 import Experiences from "@/pages/Experiences";
 import ExperienceConfirmation from "@/pages/ExperienceConfirmation";
 import Studio from "@/pages/Studio";
@@ -39,6 +40,11 @@ const AnimatedRoutes = () => {
         <Route path="/products/custom" element={<PageTransition><CustomOrders /></PageTransition>} />
         <Route path="/products/:productId" element={<PageTransition><ProductDetail /></PageTransition>} />
         <Route path="/workshops" element={<PageTransition><Workshops /></PageTransition>} />
+        <Route path="/workshop-confirmation/:bookingId" element={
+          <ProtectedRoute>
+            <PageTransition><WorkshopConfirmation /></PageTransition>
+          </ProtectedRoute>
+        } />
         <Route path="/experiences" element={<PageTransition><Experiences /></PageTransition>} />
         <Route path="/studio" element={<PageTransition><Studio /></PageTransition>} />
         <Route path="/philosophy" element={<PageTransition><Philosophy /></PageTransition>} />

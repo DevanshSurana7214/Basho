@@ -610,17 +610,91 @@ export type Database = {
         }
         Relationships: []
       }
+      workshop_bookings: {
+        Row: {
+          booking_date: string
+          booking_status: string
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          guests: number
+          id: string
+          notes: string | null
+          payment_status: string
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          time_slot: string
+          total_amount: number
+          updated_at: string
+          user_id: string
+          workshop_id: string
+        }
+        Insert: {
+          booking_date: string
+          booking_status?: string
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          guests?: number
+          id?: string
+          notes?: string | null
+          payment_status?: string
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          time_slot: string
+          total_amount: number
+          updated_at?: string
+          user_id: string
+          workshop_id: string
+        }
+        Update: {
+          booking_date?: string
+          booking_status?: string
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          guests?: number
+          id?: string
+          notes?: string | null
+          payment_status?: string
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          time_slot?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+          workshop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workshop_bookings_workshop_id_fkey"
+            columns: ["workshop_id"]
+            isOneToOne: false
+            referencedRelation: "workshops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workshops: {
         Row: {
           created_at: string | null
           current_participants: number | null
           description: string | null
+          details: Json | null
           duration: string | null
+          duration_days: number | null
           id: string
           image_url: string | null
           is_active: boolean | null
+          location: string | null
+          maps_link: string | null
           max_participants: number | null
           price: number
+          tagline: string | null
+          time_slots: Json | null
           title: string
           updated_at: string | null
           workshop_date: string | null
@@ -630,12 +704,18 @@ export type Database = {
           created_at?: string | null
           current_participants?: number | null
           description?: string | null
+          details?: Json | null
           duration?: string | null
+          duration_days?: number | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          location?: string | null
+          maps_link?: string | null
           max_participants?: number | null
           price: number
+          tagline?: string | null
+          time_slots?: Json | null
           title: string
           updated_at?: string | null
           workshop_date?: string | null
@@ -645,12 +725,18 @@ export type Database = {
           created_at?: string | null
           current_participants?: number | null
           description?: string | null
+          details?: Json | null
           duration?: string | null
+          duration_days?: number | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          location?: string | null
+          maps_link?: string | null
           max_participants?: number | null
           price?: number
+          tagline?: string | null
+          time_slots?: Json | null
           title?: string
           updated_at?: string | null
           workshop_date?: string | null

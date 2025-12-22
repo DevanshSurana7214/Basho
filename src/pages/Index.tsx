@@ -14,17 +14,24 @@ import TrustSection from "@/components/home/TrustSection";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import ChatWidget from "@/components/ChatWidget";
+import logoImage from "@/assets/logo-new.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Index = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    return !sessionStorage.getItem('basho-loaded');
+  });
 
   useEffect(() => {
-    // Longer, more cinematic loading
-    const timer = setTimeout(() => setIsLoading(false), 1200);
+    if (!isLoading) return;
+    
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      sessionStorage.setItem('basho-loaded', 'true');
+    }, 1200);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isLoading]);
 
   // Initialize GSAP ScrollTrigger for snap sections
   useEffect(() => {
@@ -61,24 +68,26 @@ const Index = () => {
             className="fixed inset-0 z-[200] flex items-center justify-center bg-charcoal"
           >
             <div className="flex flex-col items-center">
-              {/* Simple, elegant brand mark */}
-              <motion.span 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+              {/* Logo */}
+              <motion.img 
+                src={logoImage}
+                alt="Bashō"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-                className="font-serif text-3xl md:text-4xl text-cream/90 font-light tracking-wide"
-              >
-                Bashō
-              </motion.span>
-
-              {/* Subtle loading line */}
-              <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-                className="w-8 h-px bg-cream/20 mt-8 origin-left"
+                className="h-20 md:h-28 w-auto object-contain brightness-0 invert"
               />
+
+              {/* Progress bar */}
+              <div className="w-32 md:w-40 h-0.5 bg-cream/10 mt-8 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+                  className="h-full bg-cream/40 origin-left"
+                />
+              </div>
             </div>
           </motion.div>
         )}

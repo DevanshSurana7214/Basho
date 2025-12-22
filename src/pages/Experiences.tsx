@@ -284,7 +284,7 @@ const BookingSection = () => {
         key: orderData.keyId,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: 'Basho by Shivangi',
+        name: 'Basho Byy Shivangi',
         description: `${selectedExp?.title} - ${format(date, 'PPP')} at ${timeSlot}`,
         order_id: orderData.orderId,
         handler: async (response: any) => {

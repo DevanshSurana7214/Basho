@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import logo from "@/assets/logo-transparent.png";
+import logo from "@/assets/logo-new.png";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -38,32 +38,53 @@ const Navigation = () => {
   const isHomePage = location.pathname === "/";
 
   useEffect(() => {
-    // On non-home pages, always show navbar
-    if (!isHomePage) {
-      setIsVisible(true);
-      setScrolled(window.scrollY > 50);
-      const handleScroll = () => {
-        setScrolled(window.scrollY > 50);
-      };
-      window.addEventListener("scroll", handleScroll);
-      return () => window.removeEventListener("scroll", handleScroll);
-    }
-
-    // On home page, hide initially and show when hero is 80% scrolled
-    setIsVisible(false);
+    let lastScrollY = window.scrollY;
+    let ticking = false;
     
     const handleScroll = () => {
-      const viewportHeight = window.innerHeight;
-      const scrollThreshold = viewportHeight * 0.8; // 80% of viewport height
-      
-      setScrolled(window.scrollY > 50);
-      setIsVisible(window.scrollY >= scrollThreshold);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          
+          // Update scrolled state for styling
+          setScrolled(currentScrollY > 50);
+          
+          if (isHomePage) {
+            const viewportHeight = window.innerHeight;
+            const scrollThreshold = viewportHeight * 0.8;
+            
+            // On home page: just show/hide based on hero scroll position
+            setIsVisible(currentScrollY >= scrollThreshold);
+          } else {
+            // On other pages: show on scroll up, hide on scroll down
+            if (currentScrollY < 100) {
+              // Always show near top
+              setIsVisible(true);
+            } else if (currentScrollY < lastScrollY - 2) {
+              // Scrolling up - show navbar (lower threshold = faster response)
+              setIsVisible(true);
+            } else if (currentScrollY > lastScrollY + 10) {
+              // Scrolling down - hide navbar (higher threshold = less sensitive)
+              setIsVisible(false);
+            }
+          }
+          
+          lastScrollY = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    // Check initial scroll position
-    handleScroll();
+    // Initialize
+    if (isHomePage) {
+      setIsVisible(window.scrollY >= window.innerHeight * 0.8);
+    } else {
+      setIsVisible(true);
+    }
+    setScrolled(window.scrollY > 50);
     
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isHomePage]);
 
@@ -84,7 +105,7 @@ const Navigation = () => {
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -100, opacity: 0 }}
-            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
             className={`fixed z-50 inset-x-0 mx-auto transition-all duration-700 max-w-5xl w-[calc(100%-2rem)] md:w-[calc(100%-4rem)] rounded-full ${
               scrolled
                 ? "top-3 bg-parchment/80 backdrop-blur-md border border-border/50 shadow-soft"
@@ -96,7 +117,7 @@ const Navigation = () => {
                 <motion.img 
                   src={logo} 
                   alt="Basho by Shivangi" 
-                  className="h-8 md:h-10 w-auto"
+                  className="h-6 md:h-8 w-auto"
                   whileHover={{ opacity: 0.8 }}
                   transition={{ duration: 0.3 }}
                 />

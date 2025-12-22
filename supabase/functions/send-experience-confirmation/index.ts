@@ -67,8 +67,9 @@ const handler = async (req: Request): Promise<Response> => {
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
           <!-- Header -->
           <div style="text-align: center; margin-bottom: 40px;">
+            <img src="https://grdolasawzsrwuqhpheu.supabase.co/storage/v1/object/public/email-assets/logo-email.png" alt="Basho Byy Shivangi" style="max-width: 120px; height: auto; margin-bottom: 16px;" />
             <h1 style="color: #3D2914; font-size: 28px; margin: 0; font-weight: normal;">
-              Basho by Shivangi
+              Basho Byy Shivangi
             </h1>
             <p style="color: #8B7355; font-size: 14px; letter-spacing: 2px; margin-top: 8px;">
               HANDCRAFTED POTTERY
@@ -137,11 +138,18 @@ const handler = async (req: Request): Promise<Response> => {
 
           <!-- Footer -->
           <div style="text-align: center; margin-top: 30px;">
-            <p style="color: #8B7355; font-size: 14px; margin: 0 0 10px 0;">
+            <p style="color: #8B7355; font-size: 14px; margin: 0 0 16px 0;">
               Questions? Reply to this email or call us
             </p>
+            <div style="margin-bottom: 16px;">
+              <a href="https://instagram.com/bashobyyshivangi" target="_blank" style="display: inline-block; margin: 0 8px; color: #8B7355; text-decoration: none; font-size: 14px;">Instagram</a>
+              <span style="color: #a8a29e;">|</span>
+              <a href="https://basho-by-shivangi.lovable.app" target="_blank" style="display: inline-block; margin: 0 8px; color: #8B7355; text-decoration: none; font-size: 14px;">Website</a>
+              <span style="color: #a8a29e;">|</span>
+              <a href="mailto:hello@basho.in" style="display: inline-block; margin: 0 8px; color: #8B7355; text-decoration: none; font-size: 14px;">Email Us</a>
+            </div>
             <p style="color: #6B5B4F; font-size: 12px; margin: 0;">
-              Basho by Shivangi • Handcrafted with love
+              © ${new Date().getFullYear()} Basho Byy Shivangi • Handcrafted with love
             </p>
           </div>
         </div>
@@ -150,9 +158,9 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     await client.send({
-      from: Deno.env.get("GMAIL_USER")!,
+      from: `Basho Byy Shivangi <${Deno.env.get("GMAIL_USER")!}>`,
       to: email,
-      subject: `Your ${experienceName} is Confirmed! 🎨`,
+      subject: `Your ${experienceName} is Confirmed!`,
       html: htmlContent,
     });
 

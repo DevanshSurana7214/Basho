@@ -190,7 +190,8 @@ serve(async (req: Request): Promise<Response> => {
             <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
               
               <tr><td style="background-color: #292524; padding: 32px; text-align: center;">
-                <h1 style="font-family: Georgia, serif; color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px;">Bosco By Shivangi</h1>
+                <img src="https://grdolasawzsrwuqhpheu.supabase.co/storage/v1/object/public/email-assets/logo-email.png" alt="Basho Byy Shivangi" style="max-width: 120px; height: auto; margin-bottom: 16px;" />
+                <h1 style="font-family: Georgia, serif; color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px;">Basho Byy Shivangi</h1>
                 <p style="color: #a8a29e; margin: 8px 0 0 0; font-size: 12px; letter-spacing: 3px; text-transform: uppercase;">Handcrafted Pottery</p>
               </td></tr>
               
@@ -253,8 +254,15 @@ serve(async (req: Request): Promise<Response> => {
               </td></tr>
               
               <tr><td style="background-color: #292524; padding: 24px; text-align: center;">
-                <p style="color: #a8a29e; margin: 0 0 8px 0; font-size: 14px;">Thank you for supporting handcrafted pottery.</p>
-                <p style="color: #78716c; margin: 0; font-size: 12px;">© ${new Date().getFullYear()} Bosco By Shivangi. All rights reserved.</p>
+                <p style="color: #a8a29e; margin: 0 0 16px 0; font-size: 14px;">Thank you for supporting handcrafted pottery.</p>
+                <div style="margin-bottom: 16px;">
+                  <a href="https://instagram.com/bashobyyshivangi" target="_blank" style="display: inline-block; margin: 0 8px; color: #a8a29e; text-decoration: none; font-size: 14px;">Instagram</a>
+                  <span style="color: #78716c;">|</span>
+                  <a href="https://basho-by-shivangi.lovable.app" target="_blank" style="display: inline-block; margin: 0 8px; color: #a8a29e; text-decoration: none; font-size: 14px;">Website</a>
+                  <span style="color: #78716c;">|</span>
+                  <a href="mailto:hello@basho.in" style="display: inline-block; margin: 0 8px; color: #a8a29e; text-decoration: none; font-size: 14px;">Email Us</a>
+                </div>
+                <p style="color: #78716c; margin: 0; font-size: 12px;">© ${new Date().getFullYear()} Basho Byy Shivangi. All rights reserved.</p>
               </td></tr>
             </table>
           </td></tr>
@@ -289,7 +297,7 @@ serve(async (req: Request): Promise<Response> => {
 
     try {
       await client.send({
-        from: `Bosco By Shivangi <${gmailUser}>`,
+        from: `Basho Byy Shivangi <${gmailUser}>`,
         to: customer_email,
         subject: `Order Confirmed - ${order.order_number}`,
         html: emailHtml,

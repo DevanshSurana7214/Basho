@@ -46,9 +46,6 @@ interface CartContextType {
   itemCount: number;
   sessionId: string;
   isGuest: boolean;
-  isDrawerOpen: boolean;
-  openDrawer: () => void;
-  closeDrawer: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -82,11 +79,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [hasSynced, setHasSynced] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const sessionId = getOrCreateSessionId();
 
-  const openDrawer = useCallback(() => setIsDrawerOpen(true), []);
-  const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
   // Listen for auth state changes
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -241,7 +235,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       } else {
         toast.success('Added to cart');
         fetchCart();
-        openDrawer();
       }
     } else {
       // Guest - use localStorage
@@ -259,7 +252,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
               quantity: updated[existingIndex].quantity + 1,
             };
             toast.success('Added to cart');
-            openDrawer();
             saveLocalCart(updated);
             return updated;
           } else {
@@ -279,7 +271,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         };
 
         toast.success('Added to cart');
-        openDrawer();
         const updated = [...prev, newItem];
         saveLocalCart(updated);
         return updated;
@@ -383,9 +374,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       itemCount,
       sessionId,
       isGuest: !userId,
-      isDrawerOpen,
-      openDrawer,
-      closeDrawer,
     }}>
       {children}
     </CartContext.Provider>

@@ -290,24 +290,41 @@ const Products = () => {
           </section>
 
           {/* Category Filter */}
-          <section className="py-6 bg-background border-b border-border sticky top-16 z-30">
-            <div className="container px-6 space-y-4">
+          <section className="py-5 bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-16 z-30">
+            <div className="container px-6 space-y-5">
+              {/* Category Pills */}
               <div className="flex flex-wrap gap-2">
-                {categories.map((cat) => (
-                  <button
+                {categories.map((cat, index) => (
+                  <motion.button
                     key={cat}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.03 }}
                     onClick={() => setActiveCategory(cat)}
-                    className={`font-sans text-sm tracking-wider px-4 py-2 rounded-sm transition-all duration-300 capitalize ${
-                      activeCategory === cat
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
-                    }`}
+                    className={`
+                      relative font-sans text-sm tracking-wide px-5 py-2.5 rounded-full 
+                      transition-all duration-300 capitalize overflow-hidden
+                      ${activeCategory === cat
+                        ? "bg-primary text-primary-foreground shadow-warm"
+                        : "bg-card/70 text-foreground/80 border border-border/50 hover:border-primary/30 hover:bg-card"
+                      }
+                    `}
                   >
-                    {cat}
-                  </button>
+                    {/* Active indicator glow */}
+                    {activeCategory === cat && (
+                      <motion.div
+                        layoutId="activeCategoryGlow"
+                        className="absolute inset-0 bg-gradient-to-r from-primary via-terracotta to-primary rounded-full -z-10"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <span className="relative z-10">{cat}</span>
+                  </motion.button>
                 ))}
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+              
+              {/* Filters Row */}
+              <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
                 <ProductFilters
                   minPrice={minPrice}
                   maxPrice={maxPrice}
@@ -326,13 +343,23 @@ const Products = () => {
                     width: isSearchInHeader ? "auto" : 0
                   }}
                   transition={{ duration: 0.2 }}
-                  className={`${isSearchInHeader ? "block" : "hidden"} sm:min-w-[280px]`}
+                  className={`${isSearchInHeader ? "block" : "hidden"} lg:min-w-[300px]`}
                 >
                   <ProductSearch 
                     onSearch={setSearchQuery} 
                     productImages={productImages} 
                   />
                 </motion.div>
+              </div>
+              
+              {/* Results count */}
+              <div className="flex items-center gap-2 pt-1">
+                <span className="text-sm text-muted-foreground">
+                  Showing <span className="font-medium text-foreground">{filteredProducts.length}</span> {filteredProducts.length === 1 ? 'product' : 'products'}
+                  {activeCategory !== "All" && (
+                    <span> in <span className="font-medium text-primary capitalize">{activeCategory}</span></span>
+                  )}
+                </span>
               </div>
             </div>
           </section>

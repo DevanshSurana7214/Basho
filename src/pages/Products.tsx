@@ -3,7 +3,7 @@ import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
@@ -80,7 +80,25 @@ const Products = () => {
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [isSearchInHeader, setIsSearchInHeader] = useState(false);
+  const heroSearchRef = useRef<HTMLDivElement>(null);
   const { addToCart } = useCart();
+
+  // Track when hero search scrolls out of view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsSearchInHeader(!entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: "-80px 0px 0px 0px" }
+    );
+
+    if (heroSearchRef.current) {
+      observer.observe(heroSearchRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
 
   useEffect(() => {
@@ -192,6 +210,12 @@ const Products = () => {
                     Each piece is wheel-thrown by hand and fired in our studio. 
                     All items are food-safe, microwave-safe, and dishwasher-safe.
                   </p>
+                  <div ref={heroSearchRef}>
+                    <ProductSearch 
+                      onSearch={setSearchQuery} 
+                      productImages={productImages} 
+                    />
+                  </div>
                 </motion.div>
 
                 {/* Right side - Custom Order CTA */}
@@ -288,13 +312,20 @@ const Products = () => {
                   onSortChange={setSortBy}
                 />
                 
-                {/* Search bar - always visible in header */}
-                <div className="w-full lg:w-auto lg:min-w-[250px]">
-                  <ProductSearch 
-                    onSearch={setSearchQuery} 
-                    productImages={productImages} 
-                  />
-                </div>
+                {/* Search bar - only visible when scrolled */}
+                {isSearchInHeader && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.2 }}
+                    className="lg:min-w-[250px]"
+                  >
+                    <ProductSearch 
+                      onSearch={setSearchQuery} 
+                      productImages={productImages} 
+                    />
+                  </motion.div>
+                )}
               </div>
             </div>
           </section>

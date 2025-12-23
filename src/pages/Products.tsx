@@ -123,7 +123,7 @@ const Products = () => {
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('in_stock', true)
+        .order('in_stock', { ascending: false })
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -393,10 +393,16 @@ const Products = () => {
                       {/* Glow effect on hover */}
                       <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 via-amber/20 to-primary/20 rounded-2xl opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 pointer-events-none" />
                       
-                      <div className="relative bg-card rounded-xl overflow-hidden border border-border/50 group-hover:border-primary/30 transition-all duration-500 group-hover:shadow-warm">
+                      <div className={`relative bg-card rounded-xl overflow-hidden border border-border/50 group-hover:border-primary/30 transition-all duration-500 group-hover:shadow-warm ${!product.in_stock ? 'opacity-75' : ''}`}>
                         {/* Image container - clickable */}
                         <Link to={`/products/${product.id}`} className="block">
                           <div className="aspect-square bg-gradient-to-br from-secondary via-muted to-card relative overflow-hidden cursor-pointer">
+                            {/* Out of Stock Badge */}
+                            {!product.in_stock && (
+                              <div className="absolute top-3 left-3 z-20 bg-destructive text-destructive-foreground text-xs font-medium px-2.5 py-1 rounded-full">
+                                Out of Stock
+                              </div>
+                            )}
                             {/* Wishlist button */}
                             <WishlistButton 
                               product={{
@@ -431,21 +437,23 @@ const Products = () => {
                             >
                                 <Button 
                                 size="sm" 
-                                variant="terracotta"
+                                variant={product.in_stock ? "terracotta" : "secondary"}
                                 className="w-full backdrop-blur-sm"
                                 onClick={(e) => {
                                   e.preventDefault();
                                   e.stopPropagation();
-                                  handleAddToCart(product);
+                                  if (product.in_stock) {
+                                    handleAddToCart(product);
+                                  }
                                 }}
-                                disabled={addingToCart === product.id}
+                                disabled={addingToCart === product.id || !product.in_stock}
                               >
                                 {addingToCart === product.id ? (
                                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                                 ) : (
                                   <ShoppingBag className="h-4 w-4 mr-2" />
                                 )}
-                                Add to Cart
+                                {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
                               </Button>
                             </div>
                           </div>

@@ -1,100 +1,28 @@
 import { useRef, useState, useEffect } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import handsImage from "@/assets/hero/pottery-hands-clay.jpg";
-
-gsap.registerPlugin(ScrollTrigger);
+import { motion } from "framer-motion";
 
 const HERO_VIDEO_URL = "/video/pottery-hero.mp4";
 
 const ArrivalSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
 
+  // Ensure video loops smoothly
   useEffect(() => {
-    if (!sectionRef.current || !contentRef.current) return;
-
-    const ctx = gsap.context(() => {
-      // Layered parallax effect on background
-      gsap.to(".hero-bg", {
-        yPercent: 20,
-        scale: 1.08,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: 2
-        }
-      });
-
-      // Secondary overlay parallax for depth
-      gsap.to(".hero-overlay", {
-        yPercent: 10,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: 1.5
-        }
-      });
-
-      // Fade out content on scroll
-      gsap.to(contentRef.current, {
-        opacity: 0,
-        y: -50,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top top",
-          end: "40% top",
-          scrub: 1
-        }
-      });
-
-      // Initial reveal animations
-      const tl = gsap.timeline({ delay: 1.5 });
-      
-      tl.fromTo(".hero-tagline", 
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" }
-      )
-      .fromTo(".hero-title",
-        { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: 1.4, ease: "power3.out" },
-        "-=0.8"
-      )
-      .fromTo(".hero-scroll",
-        { opacity: 0 },
-        { opacity: 1, duration: 1, ease: "power2.out" },
-        "-=0.5"
-      );
-
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 1;
+    }
+  }, [videoLoaded]);
 
   return (
     <section 
       ref={sectionRef} 
-      className="snap-section relative h-screen overflow-hidden"
+      className="snap-section relative h-screen w-full overflow-hidden"
     >
-      {/* Full-screen video with parallax */}
-      <div className="hero-bg absolute inset-0 will-change-transform">
-        {/* Fallback image */}
-        <img 
-          src={handsImage} 
-          alt="Hands shaping clay on pottery wheel" 
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-            videoLoaded ? 'opacity-0' : 'opacity-100'
-          }`}
-        />
-        
-        {/* Video background */}
+      {/* Full-viewport video background */}
+      <div className="absolute inset-0">
+        {/* Video */}
         <video
           ref={videoRef}
           autoPlay
@@ -102,43 +30,148 @@ const ArrivalSection = () => {
           loop
           playsInline
           onCanPlay={() => setVideoLoaded(true)}
-          className={`w-full h-full object-cover transition-opacity duration-1000 ${
-            videoLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ filter: 'brightness(1.05) contrast(1.02)' }}
         >
           <source src={HERO_VIDEO_URL} type="video/mp4" />
         </video>
         
-        {/* Cinematic gradient overlay with parallax */}
-        <div className="hero-overlay absolute inset-0 bg-gradient-to-b from-charcoal/40 via-transparent to-charcoal/60 will-change-transform" />
+        {/* Cinematic dark overlay - deep charcoal/clay gradient */}
+        {/* Center-focused with radial gradient for depth */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(
+                ellipse 120% 100% at 50% 50%,
+                hsla(22, 35%, 10%, 0.55) 0%,
+                hsla(22, 40%, 8%, 0.70) 40%,
+                hsla(22, 43%, 6%, 0.80) 70%,
+                hsla(22, 43%, 5%, 0.88) 100%
+              )
+            `
+          }}
+        />
+        
+        {/* Top-to-bottom gradient for text readability at top */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: `
+              linear-gradient(
+                to bottom,
+                hsla(22, 40%, 8%, 0.60) 0%,
+                hsla(22, 35%, 10%, 0.35) 30%,
+                hsla(22, 30%, 12%, 0.40) 60%,
+                hsla(22, 43%, 6%, 0.75) 100%
+              )
+            `
+          }}
+        />
+
+        {/* Subtle vignette for cinematic depth */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(
+                ellipse 80% 80% at 50% 50%,
+                transparent 0%,
+                hsla(22, 43%, 5%, 0.30) 100%
+              )
+            `
+          }}
+        />
       </div>
 
-      {/* Grain texture */}
+      {/* Very subtle grain texture */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-overlay"
+        className="absolute inset-0 pointer-events-none opacity-[0.03]"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          mixBlendMode: 'overlay'
         }}
       />
 
-      {/* Content */}
-      <div 
-        ref={contentRef}
-        className="absolute inset-0 flex flex-col items-center justify-end pb-32 md:pb-40 text-center px-8"
-      >
-        <p className="hero-tagline text-[10px] md:text-xs tracking-[0.5em] uppercase text-cream/50 mb-8 opacity-0">
-          Handcrafted in Surat, India
-        </p>
+      {/* Centered hero text - architectural, editorial */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 md:px-8">
+        {/* Eyebrow text - subtle, spaced */}
+        <motion.p 
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 1.8, ease: [0.25, 0.1, 0.25, 1] }}
+          className="text-[10px] md:text-[11px] tracking-[0.45em] uppercase text-cream/50 font-light mb-6 md:mb-8"
+        >
+          Handcrafted Ceramics
+        </motion.p>
 
-        <h1 className="hero-title font-serif text-4xl md:text-6xl lg:text-7xl text-cream font-light leading-[1.1] tracking-tight opacity-0">
-          Poetry in Clay
-        </h1>
+        {/* Main headline - large serif, architectural */}
+        <motion.h1 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.4, delay: 2.1, ease: [0.25, 0.1, 0.25, 1] }}
+          className="font-serif text-cream text-center leading-[0.95] tracking-[-0.02em]"
+          style={{
+            fontSize: 'clamp(2.75rem, 10vw, 8rem)',
+            fontWeight: 300,
+          }}
+        >
+          Where Clay<br />
+          <span className="italic font-light">Finds Its Voice</span>
+        </motion.h1>
 
-        {/* Scroll indicator */}
-        <div className="hero-scroll absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0">
-          <div className="w-px h-12 bg-gradient-to-b from-cream/30 to-transparent animate-pulse" />
-        </div>
+        {/* Supporting line - understated */}
+        <motion.p 
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 2.5, ease: [0.25, 0.1, 0.25, 1] }}
+          className="text-cream/55 text-sm md:text-base font-light tracking-wide mt-8 md:mt-10 max-w-md text-center leading-relaxed"
+        >
+          Surat, India
+        </motion.p>
+
+        {/* Optional understated CTA - minimal */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 3, ease: [0.25, 0.1, 0.25, 1] }}
+          className="mt-12 md:mt-16"
+        >
+          <a 
+            href="#collection"
+            className="group inline-flex items-center gap-3 text-cream/60 hover:text-cream/90 transition-colors duration-500"
+          >
+            <span className="text-[10px] md:text-[11px] tracking-[0.35em] uppercase font-light">
+              Explore Collection
+            </span>
+            <svg 
+              className="w-4 h-4 transform group-hover:translate-y-1 transition-transform duration-500" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+              strokeWidth={1}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </a>
+        </motion.div>
       </div>
+
+      {/* Minimal scroll indicator - bottom center */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 3.5, ease: [0.25, 0.1, 0.25, 1] }}
+        className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2"
+      >
+        <div className="flex flex-col items-center gap-3">
+          <motion.div 
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="w-px h-10 bg-gradient-to-b from-cream/40 to-transparent"
+          />
+        </div>
+      </motion.div>
     </section>
   );
 };

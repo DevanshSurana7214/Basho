@@ -4,13 +4,19 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
-import { CartProvider } from "@/hooks/useCart";
+import { CartProvider, useCart } from "@/hooks/useCart";
 import { AuthProvider } from "@/hooks/useAuth";
 import { WishlistProvider } from "@/hooks/useWishlist";
 import AnimatedRoutes from "@/components/AnimatedRoutes";
 import ScrollRestoration from "@/components/ScrollRestoration";
+import CartDrawer from "@/components/CartDrawer";
 
 const queryClient = new QueryClient();
+
+function CartDrawerWrapper() {
+  const { isDrawerOpen, closeDrawer } = useCart();
+  return <CartDrawer open={isDrawerOpen} onClose={closeDrawer} />;
+}
 
 const App = () => (
   <HelmetProvider>
@@ -24,6 +30,7 @@ const App = () => (
               <BrowserRouter>
                 <ScrollRestoration />
                 <AnimatedRoutes />
+                <CartDrawerWrapper />
               </BrowserRouter>
             </WishlistProvider>
           </CartProvider>

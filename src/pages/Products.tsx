@@ -81,7 +81,9 @@ const Products = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [isSearchInHeader, setIsSearchInHeader] = useState(false);
+  const [isScrollingUp, setIsScrollingUp] = useState(true);
   const heroSearchRef = useRef<HTMLDivElement>(null);
+  const lastScrollY = useRef(0);
   const { addToCart } = useCart();
 
   // Track when hero search scrolls out of view
@@ -98,6 +100,18 @@ const Products = () => {
     }
 
     return () => observer.disconnect();
+  }, []);
+
+  // Track scroll direction
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setIsScrollingUp(currentScrollY < lastScrollY.current || currentScrollY < 100);
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
 
@@ -268,7 +282,14 @@ const Products = () => {
           </section>
 
           {/* Category Filter */}
-          <section className="py-3 bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-30">
+          <motion.section 
+            className="bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-30 overflow-hidden"
+            animate={{ 
+              paddingTop: isScrollingUp ? 12 : 8,
+              paddingBottom: isScrollingUp ? 12 : 8
+            }}
+            transition={{ duration: 0.2 }}
+          >
             <div className="container px-6">
               {/* All filters in one row */}
               <div className="flex items-center gap-3 flex-wrap lg:flex-nowrap">
@@ -312,13 +333,17 @@ const Products = () => {
                   onSortChange={setSortBy}
                 />
                 
-                {/* Search bar - only visible when scrolled */}
+                {/* Search bar - visible when scrolled past hero AND scrolling up */}
                 {isSearchInHeader && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ 
+                      opacity: isScrollingUp ? 1 : 0, 
+                      width: isScrollingUp ? 'auto' : 0,
+                      marginLeft: isScrollingUp ? 0 : -12
+                    }}
                     transition={{ duration: 0.2 }}
-                    className="lg:min-w-[250px]"
+                    className="lg:min-w-[250px] overflow-hidden"
                   >
                     <ProductSearch 
                       onSearch={setSearchQuery} 
@@ -328,7 +353,7 @@ const Products = () => {
                 )}
               </div>
             </div>
-          </section>
+          </motion.section>
 
           {/* Products Grid */}
           <section className="py-16 bg-background">

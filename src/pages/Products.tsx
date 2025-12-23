@@ -352,15 +352,6 @@ const Products = () => {
                 </motion.div>
               </div>
               
-              {/* Results count */}
-              <div className="flex items-center gap-2 pt-1">
-                <span className="text-sm text-muted-foreground">
-                  Showing <span className="font-medium text-foreground">{filteredProducts.length}</span> {filteredProducts.length === 1 ? 'product' : 'products'}
-                  {activeCategory !== "All" && (
-                    <span> in <span className="font-medium text-primary capitalize">{activeCategory}</span></span>
-                  )}
-                </span>
-              </div>
             </div>
           </section>
 

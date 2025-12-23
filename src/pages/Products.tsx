@@ -290,7 +290,7 @@ const Products = () => {
           </section>
 
           {/* Category Filter */}
-          <section className="py-5 bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-16 z-30">
+          <section className="py-5 bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-30">
             <div className="container px-6 space-y-5">
               {/* Category Pills */}
               <div className="flex flex-wrap gap-2">

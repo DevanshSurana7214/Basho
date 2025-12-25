@@ -1,88 +1,73 @@
-import { useState, useEffect } from "react";
-import { Slider } from "@/components/ui/slider";
+import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SlidersHorizontal, ArrowUpDown } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 
 interface ProductFiltersProps {
-  minPrice: number;
-  maxPrice: number;
-  priceRange: [number, number];
-  onPriceRangeChange: (range: [number, number]) => void;
   sortBy: string;
   onSortChange: (sort: string) => void;
 }
 
 const sortOptions = [
-  { value: "newest", label: "Newest First" },
-  { value: "oldest", label: "Oldest First" },
-  { value: "price-low", label: "Price: Low to High" },
-  { value: "price-high", label: "Price: High to Low" },
-  { value: "name-asc", label: "Name: A to Z" },
-  { value: "name-desc", label: "Name: Z to A" },
+  { value: "newest", label: "Newest First", icon: "✨" },
+  { value: "oldest", label: "Oldest First", icon: "📜" },
+  { value: "price-low", label: "Price: Low to High", icon: "↑" },
+  { value: "price-high", label: "Price: High to Low", icon: "↓" },
+  { value: "name-asc", label: "Name: A to Z", icon: "🔤" },
+  { value: "name-desc", label: "Name: Z to A", icon: "🔠" },
 ];
 
 const ProductFilters = ({
-  minPrice,
-  maxPrice,
-  priceRange,
-  onPriceRangeChange,
   sortBy,
   onSortChange,
 }: ProductFiltersProps) => {
-  const [localRange, setLocalRange] = useState<[number, number]>(priceRange);
-
-  useEffect(() => {
-    setLocalRange(priceRange);
-  }, [priceRange]);
-
-  const handleSliderChange = (values: number[]) => {
-    setLocalRange([values[0], values[1]]);
-  };
-
-  const handleSliderCommit = (values: number[]) => {
-    onPriceRangeChange([values[0], values[1]]);
-  };
-
   return (
-    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center">
-      {/* Price Range Filter */}
-      <div className="flex items-center gap-3 min-w-[280px]">
-        <SlidersHorizontal className="h-4 w-4 text-muted-foreground shrink-0" />
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>Price Range</span>
-            <span className="font-medium text-foreground">
-              ₹{localRange[0].toLocaleString()} - ₹{localRange[1].toLocaleString()}
-            </span>
-          </div>
-          <Slider
-            value={localRange}
-            min={minPrice}
-            max={maxPrice}
-            step={100}
-            onValueChange={handleSliderChange}
-            onValueCommit={handleSliderCommit}
-            className="w-full"
-          />
-        </div>
-      </div>
-
+    <div className="flex items-center">
       {/* Sort Dropdown */}
-      <div className="flex items-center gap-2">
-        <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-        <Select value={sortBy} onValueChange={onSortChange}>
-          <SelectTrigger className="w-[180px] h-9 text-sm">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            {sortOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative group"
+      >
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-amber/10 via-primary/10 to-terracotta/10 rounded-lg opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500" />
+        
+        <div className="relative flex items-center gap-2 bg-card/80 backdrop-blur-sm border border-border/60 rounded-lg hover:border-primary/30 transition-all duration-300 overflow-hidden">
+          {/* Icon container */}
+          <div className="flex items-center justify-center w-6 h-6 ml-2 rounded bg-gradient-to-br from-amber/10 to-primary/10 border border-amber/10">
+            <ArrowUpDown className="h-3 w-3 text-amber" />
+          </div>
+          
+          <Select value={sortBy} onValueChange={onSortChange}>
+            <SelectTrigger className="w-[130px] h-8 text-xs border-0 bg-transparent shadow-none focus:ring-0 focus:ring-offset-0 pr-3">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Sort:</span>
+                <SelectValue placeholder="Sort by" />
+              </div>
+            </SelectTrigger>
+            <SelectContent 
+              className="bg-card/95 backdrop-blur-lg border-border/60 shadow-elevated rounded-lg overflow-hidden"
+              align="end"
+            >
+              <div className="px-2 py-1 border-b border-border/40 mb-0.5">
+                <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">
+                  Sort Options
+                </span>
+              </div>
+              {sortOptions.map((option) => (
+                <SelectItem 
+                  key={option.value} 
+                  value={option.value}
+                  className="rounded mx-0.5 my-0.5 cursor-pointer text-xs transition-colors data-[highlighted]:bg-primary/10 data-[state=checked]:bg-primary/15 data-[state=checked]:text-primary"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <span className="text-xs opacity-70">{option.icon}</span>
+                    <span>{option.label}</span>
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </motion.div>
     </div>
   );
 };

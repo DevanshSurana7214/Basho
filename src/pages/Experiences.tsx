@@ -48,6 +48,15 @@ interface Experience {
   gradient: string;
 }
 
+// Custom color palette
+const colors = {
+  darkBrown: "#442D1C",
+  deepRed: "#652810",
+  mediumBrown: "#8E5022",
+  burntOrange: "#C85428",
+  cream: "#EDD8B4"
+};
+
 const experiences: Experience[] = [
   {
     id: "couple",
@@ -60,7 +69,7 @@ const experiences: Experience[] = [
     priceValue: 3500,
     image: coupleImage,
     icon: <Heart className="w-5 h-5" />,
-    gradient: "from-rose-900/90 via-rose-950/80 to-stone-950"
+    gradient: "from-[#652810]/95 via-[#442D1C]/90 to-[#442D1C]"
   },
   {
     id: "birthday",
@@ -73,7 +82,7 @@ const experiences: Experience[] = [
     priceValue: 12000,
     image: kidsImage,
     icon: <Cake className="w-5 h-5" />,
-    gradient: "from-amber-900/90 via-amber-950/80 to-stone-950"
+    gradient: "from-[#8E5022]/95 via-[#652810]/90 to-[#442D1C]"
   },
   {
     id: "farm",
@@ -86,7 +95,7 @@ const experiences: Experience[] = [
     priceValue: 15000,
     image: studioImage,
     icon: <TreePine className="w-5 h-5" />,
-    gradient: "from-emerald-900/90 via-emerald-950/80 to-stone-950"
+    gradient: "from-[#442D1C]/95 via-[#652810]/90 to-[#442D1C]"
   },
   {
     id: "studio",
@@ -99,7 +108,7 @@ const experiences: Experience[] = [
     priceValue: 2500,
     image: handsImage,
     icon: <Palette className="w-5 h-5" />,
-    gradient: "from-orange-900/90 via-orange-950/80 to-stone-950"
+    gradient: "from-[#C85428]/95 via-[#8E5022]/90 to-[#442D1C]"
   }
 ];
 
@@ -122,9 +131,9 @@ const ExperienceCard = ({ experience, index }: { experience: Experience; index: 
       onMouseLeave={() => setIsHovered(false)}
       className="group relative"
     >
-      <div className="relative overflow-hidden rounded-3xl bg-stone-900">
-        {/* Image container */}
-        <div className="relative aspect-[3/4] md:aspect-[4/5] overflow-hidden">
+      <div className="relative overflow-hidden rounded-3xl" style={{ backgroundColor: colors.darkBrown }}>
+        {/* Image container - Made taller */}
+        <div className="relative aspect-[2/3] md:aspect-[3/5] overflow-hidden">
           <motion.img
             src={experience.image}
             alt={experience.title}
@@ -138,13 +147,15 @@ const ExperienceCard = ({ experience, index }: { experience: Experience; index: 
             "absolute inset-0 bg-gradient-to-t opacity-90 transition-opacity duration-500",
             experience.gradient
           )} />
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/20 to-transparent opacity-80" />
+          <div 
+            className="absolute inset-0 bg-gradient-to-t from-[#442D1C] via-[#442D1C]/30 to-transparent opacity-90" 
+          />
           
           {/* Hover glow effect */}
           <motion.div
-            animate={{ opacity: isHovered ? 0.15 : 0 }}
+            animate={{ opacity: isHovered ? 0.2 : 0 }}
             transition={{ duration: 0.5 }}
-            className="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent"
+            className="absolute inset-0 bg-gradient-to-t from-[#C85428]/30 to-transparent"
           />
         </div>
 
@@ -157,8 +168,11 @@ const ExperienceCard = ({ experience, index }: { experience: Experience; index: 
             transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
             className="absolute top-6 left-6 md:top-8 md:left-8"
           >
-            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center">
-              <span className="text-white/80">{experience.icon}</span>
+            <div 
+              className="w-12 h-12 rounded-2xl backdrop-blur-sm border flex items-center justify-center"
+              style={{ backgroundColor: `${colors.cream}15`, borderColor: `${colors.cream}20` }}
+            >
+              <span style={{ color: colors.cream }}>{experience.icon}</span>
             </div>
           </motion.div>
 
@@ -169,8 +183,11 @@ const ExperienceCard = ({ experience, index }: { experience: Experience; index: 
             transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
             className="absolute top-6 right-6 md:top-8 md:right-8"
           >
-            <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
-              <span className="text-white font-medium text-sm">{experience.price}</span>
+            <div 
+              className="px-4 py-2 rounded-full backdrop-blur-sm border"
+              style={{ backgroundColor: `${colors.cream}15`, borderColor: `${colors.cream}20` }}
+            >
+              <span className="font-medium text-sm" style={{ color: colors.cream }}>{experience.price}</span>
             </div>
           </motion.div>
 
@@ -180,7 +197,8 @@ const ExperienceCard = ({ experience, index }: { experience: Experience; index: 
             <motion.span
               animate={{ y: isHovered ? -4 : 0 }}
               transition={{ duration: 0.4 }}
-              className="inline-block text-xs tracking-[0.2em] uppercase text-white/50"
+              className="inline-block text-xs tracking-[0.2em] uppercase"
+              style={{ color: `${colors.cream}70` }}
             >
               {experience.tagline}
             </motion.span>
@@ -189,7 +207,8 @@ const ExperienceCard = ({ experience, index }: { experience: Experience; index: 
             <motion.h3
               animate={{ y: isHovered ? -4 : 0 }}
               transition={{ duration: 0.4, delay: 0.05 }}
-              className="font-serif text-2xl md:text-3xl text-white leading-tight"
+              className="font-serif text-2xl md:text-3xl leading-tight"
+              style={{ color: colors.cream }}
             >
               {experience.title}
             </motion.h3>
@@ -204,12 +223,12 @@ const ExperienceCard = ({ experience, index }: { experience: Experience; index: 
               transition={{ duration: 0.4, delay: 0.1 }}
               className="overflow-hidden"
             >
-              <p className="text-white/60 text-sm leading-relaxed mb-4">
+              <p className="text-sm leading-relaxed mb-4" style={{ color: `${colors.cream}90` }}>
                 {experience.description}
               </p>
               
               {/* Duration */}
-              <div className="flex items-center gap-2 text-white/40 text-sm mb-4">
+              <div className="flex items-center gap-2 text-sm mb-4" style={{ color: `${colors.cream}60` }}>
                 <Clock className="w-4 h-4" />
                 <span>{experience.duration}</span>
               </div>
@@ -226,7 +245,12 @@ const ExperienceCard = ({ experience, index }: { experience: Experience; index: 
               <a href="#book">
                 <Button 
                   variant="outline" 
-                  className="w-full py-6 text-xs tracking-[0.15em] uppercase font-sans border-white/20 text-white bg-white/5 hover:bg-white hover:text-stone-900 backdrop-blur-sm transition-all duration-300"
+                  className="w-full py-6 text-xs tracking-[0.15em] uppercase font-sans backdrop-blur-sm transition-all duration-300"
+                  style={{ 
+                    borderColor: `${colors.cream}30`,
+                    color: colors.cream,
+                    backgroundColor: `${colors.cream}08`
+                  }}
                 >
                   Book Now
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -242,7 +266,10 @@ const ExperienceCard = ({ experience, index }: { experience: Experience; index: 
           transition={{ duration: 0.4 }}
           className="absolute top-0 right-0 w-24 h-24"
         >
-          <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-white/20 rounded-tr-xl" />
+          <div 
+            className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 rounded-tr-xl" 
+            style={{ borderColor: `${colors.cream}30` }}
+          />
         </motion.div>
       </div>
     </motion.div>
@@ -663,7 +690,11 @@ const StatsSection = () => {
   ];
 
   return (
-    <section ref={ref} className="py-20 bg-sand border-y border-stone-200">
+    <section 
+      ref={ref} 
+      className="py-20 border-y"
+      style={{ backgroundColor: colors.cream, borderColor: `${colors.mediumBrown}20` }}
+    >
       <div className="container max-w-5xl mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, i) => (
@@ -674,10 +705,16 @@ const StatsSection = () => {
               transition={{ duration: 0.6, delay: i * 0.1 }}
               className="text-center"
             >
-              <span className="block font-serif text-4xl md:text-5xl text-deep-clay mb-2">
+              <span 
+                className="block font-serif text-4xl md:text-5xl mb-2"
+                style={{ color: colors.darkBrown }}
+              >
                 {stat.number}
               </span>
-              <span className="text-sm text-stone-500 tracking-wide">
+              <span 
+                className="text-sm tracking-wide"
+                style={{ color: colors.mediumBrown }}
+              >
                 {stat.label}
               </span>
             </motion.div>
@@ -724,7 +761,8 @@ const Experiences = () => {
       {/* Hero Section - Clean & Elegant */}
       <section 
         ref={heroRef} 
-        className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-stone-900"
+        className="relative min-h-[90vh] flex items-center justify-center overflow-hidden"
+        style={{ backgroundColor: colors.darkBrown }}
       >
         {/* Background Image with Parallax */}
         <motion.div 
@@ -734,14 +772,18 @@ const Experiences = () => {
           <img
             src={potteryCollection}
             alt="Pottery collection"
-            className="w-full h-full object-cover opacity-50"
+            className="w-full h-full object-cover opacity-40"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-900/80 via-stone-900/60 to-stone-900" />
+          <div 
+            className="absolute inset-0" 
+            style={{ 
+              background: `linear-gradient(to bottom, ${colors.darkBrown}cc, ${colors.darkBrown}99, ${colors.darkBrown})` 
+            }} 
+          />
         </motion.div>
 
         {/* Hero Content */}
         <motion.div 
-          style={{ opacity: heroOpacity }}
           className="relative z-10 text-center px-6 max-w-4xl mx-auto"
         >
           {/* Decorative element */}
@@ -751,9 +793,9 @@ const Experiences = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="inline-flex items-center gap-3 mb-8"
           >
-            <span className="w-12 h-px bg-gradient-to-r from-transparent to-orange-400/60" />
-            <Sparkles className="w-5 h-5 text-orange-400" />
-            <span className="w-12 h-px bg-gradient-to-l from-transparent to-orange-400/60" />
+            <span className="w-12 h-px" style={{ background: `linear-gradient(to right, transparent, ${colors.burntOrange}99)` }} />
+            <Sparkles className="w-5 h-5" style={{ color: colors.burntOrange }} />
+            <span className="w-12 h-px" style={{ background: `linear-gradient(to left, transparent, ${colors.burntOrange}99)` }} />
           </motion.div>
 
           {/* Tagline */}
@@ -761,7 +803,8 @@ const Experiences = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="block font-sans text-xs tracking-[0.4em] uppercase text-orange-400/80 mb-6"
+            className="block font-sans text-xs tracking-[0.4em] uppercase mb-6"
+            style={{ color: `${colors.burntOrange}cc` }}
           >
             Curated Pottery Experiences
           </motion.span>
@@ -771,11 +814,12 @@ const Experiences = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1, delay: 0.4 }}
-            className="font-serif text-5xl md:text-7xl lg:text-8xl text-stone-100 leading-[0.95] mb-8"
+            className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[0.95] mb-8"
+            style={{ color: colors.cream }}
           >
             Create Moments
             <br />
-            <span className="italic font-light text-stone-300">with Clay</span>
+            <span className="italic font-light" style={{ color: `${colors.cream}cc` }}>with Clay</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -783,7 +827,8 @@ const Experiences = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="font-sans text-stone-400 text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-12"
+            className="font-sans text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-12"
+            style={{ color: `${colors.cream}99` }}
           >
             Intimate gatherings where hands meet clay, 
             creating memories that endure beyond the moment.
@@ -798,7 +843,11 @@ const Experiences = () => {
           >
             <a href="#experiences">
               <Button 
-                className="px-8 py-6 text-xs tracking-[0.15em] uppercase font-sans bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white shadow-lg shadow-orange-500/20"
+                className="px-8 py-6 text-xs tracking-[0.15em] uppercase font-sans text-white shadow-lg"
+                style={{ 
+                  background: `linear-gradient(to right, ${colors.burntOrange}, ${colors.mediumBrown})`,
+                  boxShadow: `0 10px 30px ${colors.burntOrange}30`
+                }}
               >
                 Explore Experiences
                 <ArrowDown className="w-4 h-4 ml-2" />
@@ -807,7 +856,12 @@ const Experiences = () => {
             <a href="#book">
               <Button 
                 variant="outline"
-                className="px-8 py-6 text-xs tracking-[0.15em] uppercase font-sans border-stone-600 text-stone-300 hover:bg-stone-800 hover:text-white"
+                className="px-8 py-6 text-xs tracking-[0.15em] uppercase font-sans"
+                style={{ 
+                  borderColor: `${colors.cream}40`,
+                  color: colors.cream,
+                  backgroundColor: 'transparent'
+                }}
               >
                 Book Now
               </Button>
@@ -825,12 +879,14 @@ const Experiences = () => {
           <motion.div
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="w-6 h-10 rounded-full border-2 border-stone-600 flex items-start justify-center p-1.5"
+            className="w-6 h-10 rounded-full border-2 flex items-start justify-center p-1.5"
+            style={{ borderColor: `${colors.cream}40` }}
           >
             <motion.div
               animate={{ y: [0, 12, 0] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className="w-1.5 h-3 bg-stone-500 rounded-full"
+              className="w-1.5 h-3 rounded-full"
+              style={{ backgroundColor: `${colors.cream}60` }}
             />
           </motion.div>
         </motion.div>
@@ -840,7 +896,11 @@ const Experiences = () => {
       <StatsSection />
 
       {/* Experience Cards Grid */}
-      <section id="experiences" className="py-20 md:py-32 bg-sand">
+      <section 
+        id="experiences" 
+        className="py-20 md:py-32"
+        style={{ backgroundColor: colors.cream }}
+      >
         <div className="container max-w-6xl mx-auto px-6">
           {/* Section header */}
           <motion.div
@@ -850,13 +910,19 @@ const Experiences = () => {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <span className="block font-sans text-xs tracking-[0.3em] uppercase text-terracotta mb-4">
+            <span 
+              className="block font-sans text-xs tracking-[0.3em] uppercase mb-4"
+              style={{ color: colors.burntOrange }}
+            >
               Our Offerings
             </span>
-            <h2 className="font-serif text-4xl md:text-5xl text-deep-clay mb-4">
+            <h2 
+              className="font-serif text-4xl md:text-5xl mb-4"
+              style={{ color: colors.darkBrown }}
+            >
               Choose Your Experience
             </h2>
-            <p className="text-stone-500 max-w-lg mx-auto">
+            <p style={{ color: colors.mediumBrown }} className="max-w-lg mx-auto">
               From intimate couple sessions to joyful celebrations, each experience is designed to create lasting connections.
             </p>
           </motion.div>
@@ -878,7 +944,10 @@ const Experiences = () => {
             alt="Pottery glazing process"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-stone-950/70" />
+          <div 
+            className="absolute inset-0" 
+            style={{ backgroundColor: `${colors.darkBrown}dd` }} 
+          />
         </div>
         
         <div className="container relative z-10 max-w-4xl mx-auto px-6 text-center">
@@ -888,13 +957,19 @@ const Experiences = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <span className="block font-sans text-xs tracking-[0.3em] uppercase text-orange-400/80 mb-6">
+            <span 
+              className="block font-sans text-xs tracking-[0.3em] uppercase mb-6"
+              style={{ color: `${colors.burntOrange}cc` }}
+            >
               Our Philosophy
             </span>
-            <blockquote className="font-serif text-3xl md:text-4xl lg:text-5xl text-stone-100 leading-relaxed mb-8 italic">
+            <blockquote 
+              className="font-serif text-3xl md:text-4xl lg:text-5xl leading-relaxed mb-8 italic"
+              style={{ color: colors.cream }}
+            >
               "Every imperfection tells a story of human touch. Every piece carries the warmth of the moment it was made."
             </blockquote>
-            <p className="text-stone-400">— Shivangi, Founder</p>
+            <p style={{ color: `${colors.cream}99` }}>— Shivangi, Founder</p>
           </motion.div>
         </div>
       </section>

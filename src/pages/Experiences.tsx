@@ -777,7 +777,7 @@ const Experiences = () => {
           <div 
             className="absolute inset-0" 
             style={{ 
-              background: `linear-gradient(to bottom, ${colors.darkBrown}cc, ${colors.darkBrown}99, ${colors.darkBrown})` 
+              background: `linear-gradient(to bottom, ${colors.darkBrown}ee, ${colors.deepRed}aa, ${colors.darkBrown})` 
             }} 
           />
         </motion.div>

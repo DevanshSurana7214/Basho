@@ -445,13 +445,13 @@ const BookingSection = () => {
         ref={ref}
         className="relative py-24 md:py-32 overflow-hidden"
         style={{
-          background: "linear-gradient(180deg, #1c1917 0%, #292524 50%, #1c1917 100%)"
+          background: "linear-gradient(180deg, #442D1C 0%, #652810 50%, #442D1C 100%)"
         }}
       >
         {/* Decorative background elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-amber-500/5 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#C85428]/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#8E5022]/10 rounded-full blur-3xl" />
         </div>
 
         <div className="container relative max-w-xl mx-auto px-6">

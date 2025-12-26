@@ -158,7 +158,7 @@ const ExperienceCard = ({ experience, index }: { experience: Experience; index: 
         }}
       >
         {/* Image section */}
-        <div className="relative aspect-[3/4] md:aspect-[2/3] overflow-hidden">
+        <div className="relative aspect-[2/3] md:aspect-[1/2] lg:aspect-[9/16] overflow-hidden">
           <motion.img
             src={experience.image}
             alt={experience.title}

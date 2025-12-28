@@ -6,7 +6,7 @@ import Navigation from "@/components/Navigation";
 import ArrivalSection from "@/components/home/ArrivalSection";
 import { HeroScrollZoom } from "@/components/home/HeroScrollZoom";
 import { SmoothScrollProvider } from "@/components/home/SmoothScroll";
-import CulturalGroundingSection from "@/components/home/CulturalGroundingSection";
+import WabiSabiRevealSection from "@/components/home/WabiSabiRevealSection";
 import TexturesGridSection from "@/components/home/TexturesGridSection";
 import ProductsShowcaseSection from "@/components/home/ProductsShowcaseSection";
 import ExperiencesSection from "@/components/home/ExperiencesSection";
@@ -102,9 +102,9 @@ const Index = () => {
             
             {/* Section 1.5: Hero Scroll Zoom - Cinematic Image Sequence */}
             <HeroScrollZoom />
-            
-            {/* Section 2: Cultural Grounding - Philosophy */}
-            <CulturalGroundingSection />
+
+            {/* Section 1.6: Wabi-Sabi word-by-word reveal */}
+            <WabiSabiRevealSection />
           
           {/* Section 3: Textures & Materials - Sensory Grid */}
           <TexturesGridSection />

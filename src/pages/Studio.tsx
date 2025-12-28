@@ -67,7 +67,7 @@ const Studio = () => {
         />
       </Helmet>
 
-      <div className="min-h-screen bg-deep-clay">
+      <div className="min-h-screen bg-sand">
         <Navigation />
         
         {/* Cinematic Hero Section */}
@@ -85,7 +85,11 @@ const Studio = () => {
               alt="Basho pottery studio interior"
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-deep-clay/60 via-deep-clay/40 to-background" />
+            {/* Multiple gradient layers for cinematic depth */}
+            <div className="absolute inset-0 bg-gradient-to-b from-deep-clay/70 via-deep-clay/50 to-deep-clay/80" />
+            <div className="absolute inset-0 bg-gradient-to-r from-deep-clay/40 via-transparent to-deep-clay/40" />
+            {/* Vignette effect */}
+            <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 40%, hsl(var(--deep-clay) / 0.6) 100%)' }} />
           </motion.div>
 
           {/* Floating decorative elements */}
@@ -172,24 +176,35 @@ const Studio = () => {
             </motion.div>
           </motion.div>
 
-          {/* Bottom gradient fade */}
-          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background to-transparent" />
+          {/* Bottom gradient fade - seamless transition to sand */}
+          <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-sand via-sand/80 to-transparent" />
         </section>
 
         <main>
           {/* Studio Story & Philosophy */}
           <section 
             ref={storyRef}
-            className="relative py-32 md:py-40 lg:py-48 overflow-hidden"
+            className="relative py-32 md:py-40 lg:py-48 overflow-hidden bg-sand"
           >
-            {/* Background decoration */}
+            {/* Background decoration - multiple subtle layers */}
             <motion.div
               initial={{ opacity: 0 }}
-              animate={isStoryInView ? { opacity: 0.5 } : {}}
+              animate={isStoryInView ? { opacity: 1 } : {}}
               transition={{ duration: 1.5 }}
               className="absolute inset-0 pointer-events-none"
               style={{
-                backgroundImage: `radial-gradient(circle at 30% 20%, hsl(var(--terracotta) / 0.05) 0%, transparent 50%)`
+                backgroundImage: `
+                  radial-gradient(circle at 20% 30%, hsl(var(--terracotta) / 0.08) 0%, transparent 40%),
+                  radial-gradient(circle at 80% 70%, hsl(var(--clay) / 0.05) 0%, transparent 40%)
+                `
+              }}
+            />
+            {/* Subtle dot pattern overlay */}
+            <div 
+              className="absolute inset-0 opacity-[0.03] pointer-events-none"
+              style={{
+                backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--deep-clay)) 1px, transparent 0)`,
+                backgroundSize: '24px 24px'
               }}
             />
 
@@ -216,7 +231,7 @@ const Studio = () => {
                     <span className="italic font-light">Becomes Art</span>
                   </h2>
 
-                  <div className="space-y-6 text-muted-foreground leading-relaxed text-lg">
+                  <div className="space-y-6 text-clay/80 leading-relaxed text-lg">
                     <p>
                       Basho was born from a simple belief: that slowing down can be transformative. 
                       In a world that moves too fast, our studio offers a rare pause—a place where 
@@ -233,7 +248,7 @@ const Studio = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={isStoryInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.8, delay: 0.5 }}
-                    className="grid grid-cols-3 gap-8 pt-8 border-t border-border/50"
+                    className="grid grid-cols-3 gap-8 pt-8 border-t border-terracotta/20"
                   >
                     {[
                       { number: "5+", label: "Years of Craft" },
@@ -242,7 +257,7 @@ const Studio = () => {
                     ].map((stat, i) => (
                       <div key={i} className="text-center">
                         <span className="font-serif text-3xl md:text-4xl text-deep-clay">{stat.number}</span>
-                        <p className="font-sans text-xs tracking-wide text-muted-foreground mt-2 uppercase">{stat.label}</p>
+                        <p className="font-sans text-xs tracking-wide text-clay mt-2 uppercase">{stat.label}</p>
                       </div>
                     ))}
                   </motion.div>
@@ -262,15 +277,15 @@ const Studio = () => {
                       style={{ y: imageY }}
                       className="col-span-7 relative"
                     >
-                      <div className="aspect-[3/4] overflow-hidden rounded-sm">
+                      <div className="aspect-[3/4] overflow-hidden rounded-lg shadow-2xl shadow-deep-clay/20">
                         <img 
                           src={rawClayTexture} 
                           alt="Raw clay texture" 
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
                         />
                       </div>
-                      {/* Decorative frame */}
-                      <div className="absolute -bottom-4 -right-4 w-full h-full border border-terracotta/20 rounded-sm -z-10" />
+                      {/* Decorative frame with gradient */}
+                      <div className="absolute -bottom-4 -right-4 w-full h-full border-2 border-terracotta/30 rounded-lg -z-10 bg-gradient-to-br from-terracotta/5 to-transparent" />
                     </motion.div>
 
                     {/* Stacked smaller images */}
@@ -279,7 +294,7 @@ const Studio = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={isStoryInView ? { opacity: 1, y: 0 } : {}}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="aspect-square overflow-hidden rounded-sm"
+                        className="aspect-square overflow-hidden rounded-lg shadow-xl shadow-deep-clay/15"
                       >
                         <img 
                           src={potteryTools} 
@@ -291,7 +306,7 @@ const Studio = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={isStoryInView ? { opacity: 1, y: 0 } : {}}
                         transition={{ duration: 0.8, delay: 0.5 }}
-                        className="aspect-[4/5] overflow-hidden rounded-sm"
+                        className="aspect-[4/5] overflow-hidden rounded-lg shadow-xl shadow-deep-clay/15"
                       >
                         <img 
                           src={kilnImage} 
@@ -307,17 +322,20 @@ const Studio = () => {
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={isStoryInView ? { opacity: 1, scale: 1 } : {}}
                     transition={{ duration: 0.6, delay: 0.8, type: "spring" }}
-                    className="absolute -left-6 top-1/2 -translate-y-1/2 bg-parchment/95 backdrop-blur-sm p-5 rounded-full shadow-xl border border-border/30"
+                    className="absolute -left-6 top-1/2 -translate-y-1/2 bg-gradient-to-br from-parchment to-sand backdrop-blur-sm p-5 rounded-full shadow-2xl shadow-terracotta/20 border border-terracotta/20"
                   >
-                    <Heart className="w-6 h-6 text-terracotta" />
+                    <Heart className="w-6 h-6 text-terracotta fill-terracotta/20" />
                   </motion.div>
                 </motion.div>
               </div>
             </div>
           </section>
 
+          {/* Transition gradient from sand to image section */}
+          <div className="h-32 bg-gradient-to-b from-sand to-deep-clay/10" />
+
           {/* Full-width Cinematic Image */}
-          <section className="relative h-[60vh] min-h-[500px] overflow-hidden">
+          <section className="relative h-[70vh] min-h-[550px] overflow-hidden -mt-32">
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -338,8 +356,11 @@ const Studio = () => {
                   className="w-full h-full object-cover"
                 />
               </motion.div>
-              <div className="absolute inset-0 bg-gradient-to-r from-deep-clay/60 via-deep-clay/30 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+              {/* Rich cinematic overlays */}
+              <div className="absolute inset-0 bg-gradient-to-r from-deep-clay/70 via-deep-clay/40 to-deep-clay/20" />
+              <div className="absolute inset-0 bg-gradient-to-t from-sand via-transparent to-sand/30" />
+              {/* Vignette */}
+              <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 70% 50%, transparent 30%, hsl(var(--deep-clay) / 0.4) 100%)' }} />
             </motion.div>
 
             {/* Quote overlay */}
@@ -371,9 +392,9 @@ const Studio = () => {
           <VirtualTourGallery />
 
           {/* Visiting Information & Location */}
-          <section className="relative py-32 md:py-40 overflow-hidden">
+          <section className="relative py-32 md:py-40 overflow-hidden bg-parchment">
             {/* Background decoration */}
-            <div className="absolute inset-0 bg-gradient-to-b from-background via-card/30 to-background" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-terracotta/5 to-transparent" />
             
             <div className="container relative px-6">
               {/* Section header */}
@@ -415,16 +436,16 @@ const Studio = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.1 }}
-                    className="group p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border/50 hover:border-terracotta/30 transition-all duration-500"
+                    className="group p-6 bg-gradient-to-br from-card to-parchment/50 backdrop-blur-sm rounded-xl border border-terracotta/20 hover:border-terracotta/40 hover:shadow-xl hover:shadow-terracotta/10 transition-all duration-500"
                   >
                     <div className="flex items-start gap-5">
-                      <div className="p-3 bg-terracotta/10 rounded-full text-terracotta group-hover:bg-terracotta group-hover:text-white transition-all duration-500">
+                      <div className="p-3 bg-gradient-to-br from-terracotta/20 to-terracotta/10 rounded-xl text-terracotta group-hover:from-terracotta group-hover:to-terracotta/80 group-hover:text-white transition-all duration-500 shadow-sm">
                         <MapPin className="w-5 h-5" />
                       </div>
                       <div>
-                        <h3 className="font-serif text-xl text-deep-clay mb-2">Location</h3>
-                        <p className="text-muted-foreground">Piplod, Surat, Gujarat, India</p>
-                        <p className="text-sm text-stone mt-2 italic">Exact address shared upon booking confirmation</p>
+                        <h3 className="font-serif text-xl text-deep-clay mb-2 group-hover:text-terracotta transition-colors">Location</h3>
+                        <p className="text-clay/80">Piplod, Surat, Gujarat, India</p>
+                        <p className="text-sm text-clay/60 mt-2 italic">Exact address shared upon booking confirmation</p>
                       </div>
                     </div>
                   </motion.div>
@@ -435,16 +456,16 @@ const Studio = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.2 }}
-                    className="group p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border/50 hover:border-terracotta/30 transition-all duration-500"
+                    className="group p-6 bg-gradient-to-br from-card to-parchment/50 backdrop-blur-sm rounded-xl border border-terracotta/20 hover:border-terracotta/40 hover:shadow-xl hover:shadow-terracotta/10 transition-all duration-500"
                   >
                     <div className="flex items-start gap-5">
-                      <div className="p-3 bg-terracotta/10 rounded-full text-terracotta group-hover:bg-terracotta group-hover:text-white transition-all duration-500">
+                      <div className="p-3 bg-gradient-to-br from-terracotta/20 to-terracotta/10 rounded-xl text-terracotta group-hover:from-terracotta group-hover:to-terracotta/80 group-hover:text-white transition-all duration-500 shadow-sm">
                         <Clock className="w-5 h-5" />
                       </div>
                       <div>
-                        <h3 className="font-serif text-xl text-deep-clay mb-2">Studio Hours</h3>
-                        <p className="text-muted-foreground">Tuesday – Sunday: 10:00 AM – 6:00 PM</p>
-                        <p className="text-muted-foreground">Monday: Closed for studio work</p>
+                        <h3 className="font-serif text-xl text-deep-clay mb-2 group-hover:text-terracotta transition-colors">Studio Hours</h3>
+                        <p className="text-clay/80">Tuesday – Sunday: 10:00 AM – 6:00 PM</p>
+                        <p className="text-clay/80">Monday: Closed for studio work</p>
                       </div>
                     </div>
                   </motion.div>
@@ -455,15 +476,15 @@ const Studio = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.3 }}
-                    className="group p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border/50 hover:border-terracotta/30 transition-all duration-500"
+                    className="group p-6 bg-gradient-to-br from-card to-parchment/50 backdrop-blur-sm rounded-xl border border-terracotta/20 hover:border-terracotta/40 hover:shadow-xl hover:shadow-terracotta/10 transition-all duration-500"
                   >
                     <div className="flex items-start gap-5">
-                      <div className="p-3 bg-terracotta/10 rounded-full text-terracotta group-hover:bg-terracotta group-hover:text-white transition-all duration-500">
+                      <div className="p-3 bg-gradient-to-br from-terracotta/20 to-terracotta/10 rounded-xl text-terracotta group-hover:from-terracotta group-hover:to-terracotta/80 group-hover:text-white transition-all duration-500 shadow-sm">
                         <Calendar className="w-5 h-5" />
                       </div>
                       <div>
-                        <h3 className="font-serif text-xl text-deep-clay mb-2">Appointments</h3>
-                        <p className="text-muted-foreground">
+                        <h3 className="font-serif text-xl text-deep-clay mb-2 group-hover:text-terracotta transition-colors">Appointments</h3>
+                        <p className="text-clay/80">
                           All visits are by appointment only. This ensures we can give 
                           you our full attention and make your experience meaningful.
                         </p>
@@ -496,7 +517,7 @@ const Studio = () => {
                           whileInView={{ opacity: 1, x: 0 }}
                           viewport={{ once: true }}
                           transition={{ delay: 0.5 + i * 0.1 }}
-                          className="flex items-start gap-4 text-muted-foreground"
+                          className="flex items-start gap-4 text-clay/80"
                         >
                           <Star className="w-4 h-4 text-terracotta/70 mt-1 flex-shrink-0" />
                           <span>{item}</span>
@@ -511,7 +532,7 @@ const Studio = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.6 }}
-                    className="pt-8 border-t border-border/50"
+                    className="pt-8 border-t border-terracotta/20"
                   >
                     <h3 className="font-serif text-xl text-deep-clay mb-4">
                       Get in Touch
@@ -521,18 +542,18 @@ const Studio = () => {
                         href="https://www.instagram.com/bashobyyshivangi/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group flex items-center gap-3 text-muted-foreground hover:text-terracotta transition-colors"
+                        className="group flex items-center gap-3 text-clay hover:text-terracotta transition-colors"
                       >
-                        <div className="p-2 bg-muted rounded-full group-hover:bg-terracotta/10 transition-colors">
+                        <div className="p-2 bg-terracotta/10 rounded-full group-hover:bg-terracotta/20 transition-colors">
                           <Instagram size={18} />
                         </div>
                         <span className="font-sans text-sm">@bashobyyshivangi</span>
                       </a>
                       <a
                         href="mailto:hello@basho.in"
-                        className="group flex items-center gap-3 text-muted-foreground hover:text-terracotta transition-colors"
+                        className="group flex items-center gap-3 text-clay hover:text-terracotta transition-colors"
                       >
-                        <div className="p-2 bg-muted rounded-full group-hover:bg-terracotta/10 transition-colors">
+                        <div className="p-2 bg-terracotta/10 rounded-full group-hover:bg-terracotta/20 transition-colors">
                           <Mail size={18} />
                         </div>
                         <span className="font-sans text-sm">hello@basho.in</span>
@@ -549,9 +570,9 @@ const Studio = () => {
                   transition={{ duration: 0.8, delay: 0.2 }}
                   className="space-y-4"
                 >
-                  <div className="relative aspect-square lg:aspect-auto lg:h-full min-h-[500px] rounded-lg overflow-hidden border border-border/50 shadow-xl">
-                    {/* Decorative frame */}
-                    <div className="absolute -right-3 -bottom-3 w-full h-full border border-terracotta/20 rounded-lg -z-10" />
+                  <div className="relative aspect-square lg:aspect-auto lg:h-full min-h-[500px] rounded-xl overflow-hidden border-2 border-terracotta/30 shadow-2xl shadow-deep-clay/20">
+                    {/* Decorative frame with gradient */}
+                    <div className="absolute -right-4 -bottom-4 w-full h-full border-2 border-terracotta/40 rounded-xl -z-10 bg-gradient-to-br from-terracotta/10 to-transparent" />
                     
                     <iframe
                       src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14879.05833149969!2d72.78916!3d21.1459!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be04f5c8f5d3e2f%3A0x7c0a1b8c0c8d8e0a!2sPiplod%2C%20Surat%2C%20Gujarat%2C%20India!5e0!3m2!1sen!2sin!4v1699000000000!5m2!1sen!2sin"
@@ -580,11 +601,11 @@ const Studio = () => {
           </section>
 
           {/* Studio Policies */}
-          <section className="relative py-32 md:py-40 bg-card/50 overflow-hidden">
+          <section className="relative py-32 md:py-40 bg-sand overflow-hidden">
             {/* Background pattern */}
-            <div className="absolute inset-0 opacity-30"
+            <div className="absolute inset-0 opacity-20"
               style={{
-                backgroundImage: `radial-gradient(circle at 2px 2px, hsl(var(--border)) 1px, transparent 0)`,
+                backgroundImage: `radial-gradient(circle at 2px 2px, hsl(var(--terracotta)) 1px, transparent 0)`,
                 backgroundSize: '32px 32px'
               }}
             />
@@ -611,7 +632,7 @@ const Studio = () => {
                 <h2 className="font-serif text-4xl md:text-5xl text-deep-clay">
                   Studio Policies
                 </h2>
-                <p className="font-sans text-muted-foreground mt-4 max-w-lg mx-auto">
+                <p className="font-sans text-clay mt-4 max-w-lg mx-auto">
                   A few gentle guidelines to ensure everyone enjoys their time in our space
                 </p>
               </motion.div>
@@ -655,15 +676,15 @@ const Studio = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className="group bg-background p-8 rounded-lg border border-border/50 hover:border-terracotta/30 hover:shadow-lg transition-all duration-500"
+                    className="group bg-gradient-to-br from-card to-parchment/60 p-8 rounded-xl border border-terracotta/20 hover:border-terracotta/40 hover:shadow-xl hover:shadow-terracotta/10 hover:-translate-y-1 transition-all duration-500"
                   >
-                    <div className="p-3 bg-terracotta/10 rounded-full text-terracotta w-fit mb-5 group-hover:bg-terracotta group-hover:text-white transition-all duration-500">
+                    <div className="p-3 bg-gradient-to-br from-terracotta/20 to-terracotta/10 rounded-xl text-terracotta w-fit mb-5 group-hover:from-terracotta group-hover:to-terracotta/80 group-hover:text-white transition-all duration-500 shadow-sm">
                       {policy.icon}
                     </div>
-                    <h3 className="font-serif text-xl text-deep-clay mb-3">
+                    <h3 className="font-serif text-xl text-deep-clay mb-3 group-hover:text-terracotta transition-colors">
                       {policy.title}
                     </h3>
-                    <p className="font-sans text-sm text-muted-foreground leading-relaxed">
+                    <p className="font-sans text-sm text-clay/80 leading-relaxed">
                       {policy.description}
                     </p>
                   </motion.div>
@@ -672,88 +693,6 @@ const Studio = () => {
             </div>
           </section>
 
-          {/* CTA Section */}
-          <section className="relative py-32 md:py-40 overflow-hidden">
-            {/* Background */}
-            <div className="absolute inset-0 bg-deep-clay" />
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 0.1 }}
-              viewport={{ once: true }}
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `url(${studioInterior})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-            />
-
-            <div className="container relative px-6">
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1 }}
-                className="max-w-3xl mx-auto text-center"
-              >
-                {/* Decorative element */}
-                <motion.div
-                  initial={{ scale: 0 }}
-                  whileInView={{ scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="inline-flex items-center justify-center w-20 h-20 rounded-full border border-parchment/20 mb-8"
-                >
-                  <Sparkles className="w-6 h-6 text-terracotta" />
-                </motion.div>
-
-                <span className="block font-sans text-xs tracking-[0.3em] uppercase text-terracotta mb-4">
-                  Ready to Experience?
-                </span>
-                
-                <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-parchment leading-tight">
-                  Come Create
-                  <br />
-                  <span className="italic font-light">With Us</span>
-                </h2>
-                
-                <p className="font-sans text-parchment/60 mt-6 leading-relaxed text-lg max-w-xl mx-auto">
-                  Whether you're looking to try your hand at the wheel, celebrate a special 
-                  occasion, or simply spend time in a space that inspires calm—we'd love to welcome you.
-                </p>
-
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.5 }}
-                  className="w-20 h-px bg-parchment/30 mx-auto my-10"
-                />
-                
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button 
-                    size="lg" 
-                    asChild
-                    className="bg-terracotta hover:bg-terracotta/90 text-white px-10 py-7 text-xs tracking-[0.2em] uppercase font-sans"
-                  >
-                    <Link to="/experiences#studio">
-                      Book Studio Visit
-                    </Link>
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="lg" 
-                    asChild
-                    className="border-parchment/30 text-parchment hover:bg-parchment/10 px-10 py-7 text-xs tracking-[0.2em] uppercase font-sans"
-                  >
-                    <Link to="/contact">
-                      Contact Studio
-                    </Link>
-                  </Button>
-                </div>
-              </motion.div>
-            </div>
-          </section>
         </main>
         <Footer />
       </div>

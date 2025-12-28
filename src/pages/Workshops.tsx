@@ -733,7 +733,7 @@ const Workshops = () => {
           </section>
 
           {/* FAQ - Minimal & Elegant */}
-          <section className="py-32 bg-muted/30">
+          <section className="py-32 bg-sand">
             <div className="container px-6">
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -742,18 +742,26 @@ const Workshops = () => {
                 className="max-w-2xl mx-auto"
               >
                 <div className="text-center mb-16">
-                  <motion.div
-                    initial={{ scaleX: 0 }}
-                    whileInView={{ scaleX: 1 }}
+                  <motion.span
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="w-12 h-px bg-primary/50 mx-auto mb-6"
-                  />
-                  <h2 className="font-serif text-3xl md:text-4xl text-foreground">
+                    className="font-sans text-sm tracking-widest uppercase text-terracotta"
+                  >
                     Common Questions
-                  </h2>
+                  </motion.span>
+                  <motion.h2
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 }}
+                    className="font-serif text-3xl md:text-4xl text-deep-clay mt-4"
+                  >
+                    Everything You Need to Know
+                  </motion.h2>
                 </div>
                 
-                <div className="space-y-0 divide-y divide-border/50">
+                <div className="space-y-4">
                   {[
                     { 
                       q: "Do I need prior experience?", 
@@ -778,10 +786,10 @@ const Workshops = () => {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.1 }}
-                      className="py-8 group"
+                      className="bg-card/80 border border-border/40 rounded-lg px-6 py-5 group hover:bg-card transition-colors"
                     >
-                      <h3 className="font-serif text-xl text-foreground mb-3 group-hover:text-primary transition-colors">{faq.q}</h3>
-                      <p className="text-muted-foreground leading-relaxed">{faq.a}</p>
+                      <h3 className="font-serif text-xl text-deep-clay mb-3 group-hover:text-terracotta transition-colors">{faq.q}</h3>
+                      <p className="text-clay/80 leading-relaxed">{faq.a}</p>
                     </motion.div>
                   ))}
                 </div>
@@ -790,10 +798,10 @@ const Workshops = () => {
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
-                  className="text-center mt-12 pt-8 border-t border-border/30"
+                  className="text-center mt-12 pt-8 border-t border-terracotta/20"
                 >
-                  <p className="text-muted-foreground mb-4">Have more questions?</p>
-                  <Button variant="outline" asChild className="rounded-full">
+                  <p className="text-clay mb-4">Have more questions?</p>
+                  <Button variant="outline" asChild className="rounded-full border-terracotta/50 text-terracotta hover:bg-terracotta hover:text-white">
                     <Link to="/contact">Get in Touch</Link>
                   </Button>
                 </motion.div>

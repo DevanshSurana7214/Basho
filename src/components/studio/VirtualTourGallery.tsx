@@ -109,27 +109,47 @@ const VirtualTourGallery = () => {
   }, [isAutoPlaying, selectedIndex, goToNext]);
 
   return (
-    <section className="py-20 md:py-28 bg-sand/50">
-      <div className="container px-6">
+    <section className="py-24 md:py-32 bg-gradient-to-b from-sand via-parchment/50 to-sand relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div 
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--terracotta)) 1px, transparent 0)`,
+          backgroundSize: '32px 32px'
+        }}
+      />
+      <div className="absolute top-0 left-0 w-96 h-96 bg-terracotta/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-clay/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+
+      <div className="container px-6 relative">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <span className="font-sans text-xs tracking-[0.3em] uppercase text-terracotta">
+          <motion.div
+            initial={{ scale: 0 }}
+            whileInView={{ scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-terracotta/10 mb-6"
+          >
+            <Play className="w-5 h-5 text-terracotta" />
+          </motion.div>
+          <span className="block font-sans text-xs tracking-[0.3em] uppercase text-terracotta mb-4">
             Explore Our Space
           </span>
-          <h2 className="font-serif text-3xl md:text-4xl text-deep-clay mt-4">
+          <h2 className="font-serif text-4xl md:text-5xl text-deep-clay">
             Virtual Studio Tour
           </h2>
-          <p className="font-sans text-muted-foreground mt-4 max-w-lg mx-auto">
+          <p className="font-sans text-clay/80 mt-4 max-w-lg mx-auto">
             Step inside our sanctuary of creation. Click any image to explore in full-screen.
           </p>
         </motion.div>
 
         {/* Thumbnail Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
           {tourImages.map((image, index) => (
             <motion.div
               key={index}
@@ -137,7 +157,7 @@ const VirtualTourGallery = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="group relative aspect-[4/3] overflow-hidden rounded-sm cursor-pointer"
+              className="group relative aspect-[4/3] overflow-hidden rounded-xl cursor-pointer shadow-lg shadow-deep-clay/10 hover:shadow-xl hover:shadow-terracotta/15 transition-all duration-500"
               onClick={() => openFullscreen(index)}
             >
               <img
@@ -145,13 +165,17 @@ const VirtualTourGallery = () => {
                 alt={image.alt}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-deep-clay/0 group-hover:bg-deep-clay/40 transition-colors duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-deep-clay/70 via-deep-clay/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <Maximize2 className="w-8 h-8 text-white mb-2" />
-                <span className="font-sans text-sm text-white text-center px-4">
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-full mb-3">
+                  <Maximize2 className="w-6 h-6 text-white" />
+                </div>
+                <span className="font-serif text-base text-white text-center px-4">
                   {image.title}
                 </span>
               </div>
+              {/* Subtle border glow on hover */}
+              <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-terracotta/30 transition-colors duration-500" />
             </motion.div>
           ))}
         </div>
@@ -161,17 +185,16 @@ const VirtualTourGallery = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mt-10"
+          className="text-center mt-12"
         >
           <Button
-            variant="outline"
-            className="border-terracotta text-terracotta hover:bg-terracotta hover:text-white"
+            className="bg-gradient-to-r from-terracotta to-terracotta/90 hover:from-terracotta/90 hover:to-terracotta text-white px-8 py-6 text-xs tracking-[0.2em] uppercase font-sans shadow-lg shadow-terracotta/20 hover:shadow-xl hover:shadow-terracotta/30 transition-all duration-300"
             onClick={() => {
               openFullscreen(0);
               setIsAutoPlaying(true);
             }}
           >
-            <Play className="w-4 h-4 mr-2" />
+            <Play className="w-4 h-4 mr-3" />
             Start Virtual Tour
           </Button>
         </motion.div>
@@ -184,36 +207,36 @@ const VirtualTourGallery = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-deep-clay/95 flex items-center justify-center"
+            className="fixed inset-0 z-50 bg-deep-clay/98 backdrop-blur-sm flex items-center justify-center"
             onClick={closeFullscreen}
           >
             {/* Close Button */}
             <button
-              className="absolute top-6 right-6 z-50 p-2 text-white/80 hover:text-white transition-colors"
+              className="absolute top-6 right-6 z-50 p-3 bg-white/10 backdrop-blur-sm rounded-full text-white/80 hover:text-white hover:bg-white/20 transition-all"
               onClick={closeFullscreen}
             >
-              <X className="w-8 h-8" />
+              <X className="w-6 h-6" />
             </button>
 
             {/* Navigation Arrows */}
             <button
-              className="absolute left-4 md:left-8 z-50 p-3 text-white/60 hover:text-white transition-colors"
+              className="absolute left-4 md:left-8 z-50 p-4 bg-white/5 backdrop-blur-sm rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all"
               onClick={(e) => {
                 e.stopPropagation();
                 goToPrevious();
               }}
             >
-              <ChevronLeft className="w-10 h-10" />
+              <ChevronLeft className="w-8 h-8" />
             </button>
 
             <button
-              className="absolute right-4 md:right-8 z-50 p-3 text-white/60 hover:text-white transition-colors"
+              className="absolute right-4 md:right-8 z-50 p-4 bg-white/5 backdrop-blur-sm rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all"
               onClick={(e) => {
                 e.stopPropagation();
                 goToNext();
               }}
             >
-              <ChevronRight className="w-10 h-10" />
+              <ChevronRight className="w-8 h-8" />
             </button>
 
             {/* Image Container */}
@@ -226,29 +249,36 @@ const VirtualTourGallery = () => {
               className="relative max-w-5xl max-h-[80vh] mx-auto px-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <img
-                src={tourImages[selectedIndex].src}
-                alt={tourImages[selectedIndex].alt}
-                className="max-w-full max-h-[70vh] object-contain rounded-sm mx-auto"
-              />
+              <div className="relative rounded-lg overflow-hidden shadow-2xl">
+                <img
+                  src={tourImages[selectedIndex].src}
+                  alt={tourImages[selectedIndex].alt}
+                  className="max-w-full max-h-[70vh] object-contain mx-auto"
+                />
+              </div>
               
               {/* Image Info */}
-              <div className="text-center mt-6">
-                <h3 className="font-serif text-2xl text-white">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-center mt-8"
+              >
+                <h3 className="font-serif text-2xl md:text-3xl text-white">
                   {tourImages[selectedIndex].title}
                 </h3>
-                <p className="font-sans text-white/70 mt-2 max-w-lg mx-auto">
+                <p className="font-sans text-white/60 mt-3 max-w-lg mx-auto leading-relaxed">
                   {tourImages[selectedIndex].description}
                 </p>
-              </div>
+              </motion.div>
             </motion.div>
 
             {/* Thumbnail Navigation */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-full">
               {tourImages.map((_, index) => (
                 <button
                   key={index}
-                  className="relative w-2 h-2 rounded-full bg-white/40 hover:bg-white/60 transition-colors"
+                  className="relative w-2.5 h-2.5 rounded-full bg-white/30 hover:bg-white/50 transition-colors"
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedIndex(index);
@@ -257,8 +287,7 @@ const VirtualTourGallery = () => {
                   {index === selectedIndex && (
                     <motion.div
                       layoutId="activeDot"
-                      className="absolute inset-0 bg-white rounded-full"
-                      style={{ width: 24, left: -8 }}
+                      className="absolute inset-0 bg-terracotta rounded-full"
                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     />
                   )}
@@ -268,9 +297,9 @@ const VirtualTourGallery = () => {
 
             {/* Auto-play indicator */}
             {isAutoPlaying && (
-              <div className="absolute top-6 left-6 flex items-center gap-2 text-white/60">
+              <div className="absolute top-6 left-6 flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
                 <div className="w-2 h-2 rounded-full bg-terracotta animate-pulse" />
-                <span className="font-sans text-sm">Auto-playing</span>
+                <span className="font-sans text-sm text-white/80">Auto-playing</span>
               </div>
             )}
           </motion.div>

@@ -430,233 +430,309 @@ const BookingSection = () => {
       <section
         id="book"
         ref={ref}
-        className="relative py-24 md:py-32 overflow-hidden"
-        style={{
-          background: "linear-gradient(180deg, #442D1C 0%, #652810 50%, #442D1C 100%)"
-        }}
+        className="relative py-28 md:py-40 overflow-hidden bg-sand"
       >
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#C85428]/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#8E5022]/10 rounded-full blur-3xl" />
+        {/* Warm decorative background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-full" style={{
+            background: `
+              radial-gradient(ellipse 80% 50% at 20% 20%, hsl(var(--terracotta) / 0.12) 0%, transparent 50%),
+              radial-gradient(ellipse 60% 40% at 80% 80%, hsl(var(--clay) / 0.08) 0%, transparent 50%)
+            `
+          }} />
+          {/* Subtle pattern overlay */}
+          <div 
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--deep-clay)) 1px, transparent 0)`,
+              backgroundSize: '32px 32px'
+            }}
+          />
         </div>
 
-        <div className="container relative max-w-xl mx-auto px-6">
-          {/* Section header */}
+        <div className="container relative max-w-2xl mx-auto px-6">
+          {/* Elegant section header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8 }}
-            className="text-center mb-12"
+            className="text-center mb-14"
           >
+            {/* Decorative circle */}
             <motion.div
-              initial={{ scale: 0 }}
-              animate={isInView ? { scale: 1 } : {}}
-              transition={{ duration: 0.6, delay: 0.2, type: "spring" }}
-              className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-orange-500/20 to-amber-500/10 border border-orange-500/20 mb-6"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={isInView ? { scale: 1, rotate: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.2, type: "spring", stiffness: 100 }}
+              className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-8 relative"
             >
-              <Sparkles className="w-6 h-6 text-orange-400" />
+              <div className="absolute inset-0 rounded-full border-2 border-terracotta/30" />
+              <div className="absolute inset-2 rounded-full border border-terracotta/20" />
+              <Calendar className="w-7 h-7 text-terracotta" />
             </motion.div>
             
-            <span className="block font-sans text-xs tracking-[0.3em] uppercase text-orange-400/80 mb-4">
-              Reserve Your Spot
-            </span>
-            <h2 className="font-serif text-4xl md:text-5xl text-stone-100 mb-3">
-              Book an Experience
+            <motion.span 
+              initial={{ opacity: 0 }}
+              animate={isInView ? { opacity: 1 } : {}}
+              transition={{ delay: 0.4 }}
+              className="flex items-center justify-center gap-4 mb-5"
+            >
+              <span className="w-12 h-px bg-terracotta/40" />
+              <span className="font-sans text-xs tracking-[0.35em] uppercase text-terracotta">
+                Reserve Your Spot
+              </span>
+              <span className="w-12 h-px bg-terracotta/40" />
+            </motion.span>
+            
+            <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-deep-clay leading-tight">
+              Book an
+              <span className="italic font-light"> Experience</span>
             </h2>
-            <p className="text-stone-400 max-w-md mx-auto">
+            
+            <p className="text-clay/70 mt-4 max-w-md mx-auto text-lg leading-relaxed">
               Choose your experience and let us create something beautiful together
             </p>
           </motion.div>
 
-          {/* Auth prompt */}
+          {/* Auth prompt with warm styling */}
           {!user && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4 }}
-              className="bg-stone-800/50 backdrop-blur-sm border border-stone-700/50 rounded-2xl p-8 mb-8 text-center"
+              className="relative bg-gradient-to-br from-parchment via-parchment to-sand rounded-3xl p-8 md:p-10 mb-10 text-center border border-terracotta/15 shadow-xl shadow-terracotta/5 overflow-hidden"
             >
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-stone-700/50 mb-4">
-                <LogIn className="w-5 h-5 text-stone-400" />
+              {/* Decorative corner accent */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-terracotta/10 to-transparent rounded-bl-[4rem]" />
+              
+              <div className="relative">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-terracotta/15 to-clay/10 border border-terracotta/20 mb-5">
+                  <LogIn className="w-6 h-6 text-terracotta" />
+                </div>
+                <p className="text-clay/80 mb-6 text-lg">Please sign in to book an experience</p>
+                <Link to="/auth">
+                  <Button 
+                    className="px-10 py-6 text-xs tracking-[0.2em] uppercase bg-gradient-to-r from-terracotta to-terracotta/90 hover:from-terracotta/90 hover:to-terracotta text-white shadow-lg shadow-terracotta/25 hover:shadow-xl hover:shadow-terracotta/30 transition-all duration-300"
+                  >
+                    Sign In to Continue
+                  </Button>
+                </Link>
               </div>
-              <p className="text-stone-400 mb-6">Please sign in to book an experience</p>
-              <Link to="/auth">
-                <Button 
-                  variant="outline" 
-                  className="px-8 py-5 text-xs tracking-[0.15em] uppercase border-orange-500/30 text-orange-400 hover:bg-orange-500 hover:text-white hover:border-orange-500"
-                >
-                  Sign In
-                </Button>
-              </Link>
             </motion.div>
           )}
 
-          {/* Booking form */}
+          {/* Beautiful booking form card */}
           <motion.form
             initial={{ opacity: 0, y: 40 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.3 }}
             onSubmit={handleSubmit}
-            className="space-y-6 bg-stone-800/30 backdrop-blur-xl border border-stone-700/40 rounded-3xl p-6 md:p-8"
+            className="relative bg-gradient-to-br from-parchment via-parchment to-sand/80 rounded-[2rem] p-8 md:p-10 shadow-2xl shadow-deep-clay/10 border border-terracotta/15 overflow-hidden"
           >
-            {/* Experience Type */}
-            <div className="space-y-2">
-              <label className="font-sans text-xs tracking-[0.15em] uppercase text-stone-500">
-                Experience Type
-              </label>
-              <Select value={selectedExperience} onValueChange={setSelectedExperience}>
-                <SelectTrigger className="bg-stone-900/50 border-stone-700/50 h-14 text-stone-200 focus:ring-orange-500/30 focus:border-orange-500/50">
-                  <SelectValue placeholder="Choose an experience" />
-                </SelectTrigger>
-                <SelectContent className="bg-stone-900 border-stone-700">
-                  {experiences.map((exp) => (
-                    <SelectItem 
-                      key={exp.id} 
-                      value={exp.id}
-                      className="text-stone-200 focus:bg-stone-800 focus:text-white"
-                    >
-                      {exp.title} - {exp.price}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Date & Time Row */}
-            <div className="grid grid-cols-2 gap-4">
-              {/* Date Picker */}
-              <div className="space-y-2">
-                <label className="font-sans text-xs tracking-[0.15em] uppercase text-stone-500">
-                  Date
+            {/* Decorative elements */}
+            <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-terracotta/8 to-transparent rounded-br-[5rem]" />
+            <div className="absolute bottom-0 right-0 w-48 h-48 bg-gradient-to-tl from-clay/5 to-transparent rounded-tl-[5rem]" />
+            
+            <div className="relative space-y-7">
+              {/* Experience Type */}
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 font-sans text-xs tracking-[0.2em] uppercase text-deep-clay/70">
+                  <Sparkles className="w-3.5 h-3.5 text-terracotta/70" />
+                  Experience Type
                 </label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal bg-stone-900/50 border-stone-700/50 h-14 hover:bg-stone-800/50",
-                        !date ? "text-stone-500" : "text-stone-200"
-                      )}
-                    >
-                      <Calendar className="mr-2 h-4 w-4 text-stone-500" />
-                      {date ? format(date, "MMM d") : "Pick date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-stone-900 border-stone-700" align="start">
-                    <CalendarComponent
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      disabled={(date) => date < new Date()}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              {/* Time Slot */}
-              <div className="space-y-2">
-                <label className="font-sans text-xs tracking-[0.15em] uppercase text-stone-500">
-                  Time
-                </label>
-                <Select value={timeSlot} onValueChange={setTimeSlot}>
-                  <SelectTrigger className="bg-stone-900/50 border-stone-700/50 h-14 text-stone-200 focus:ring-orange-500/30">
-                    <SelectValue placeholder="Select time" />
+                <Select value={selectedExperience} onValueChange={setSelectedExperience}>
+                  <SelectTrigger className="bg-white/60 border-terracotta/20 h-14 text-deep-clay focus:ring-terracotta/30 focus:border-terracotta/40 rounded-xl hover:border-terracotta/30 transition-colors shadow-sm">
+                    <SelectValue placeholder="Choose your experience..." />
                   </SelectTrigger>
-                  <SelectContent className="bg-stone-900 border-stone-700">
-                    {timeSlots.map((slot) => (
-                      <SelectItem 
-                        key={slot} 
-                        value={slot}
-                        className="text-stone-200 focus:bg-stone-800 focus:text-white"
-                      >
-                        {slot}
-                      </SelectItem>
-                    ))}
+                  <SelectContent className="bg-parchment border-terracotta/20 rounded-xl shadow-xl">
+                    {experiences.map((exp) => {
+                      const TypeIcon = getExperienceTypeInfo(exp.id).icon;
+                      return (
+                        <SelectItem 
+                          key={exp.id} 
+                          value={exp.id}
+                          className="text-deep-clay focus:bg-terracotta/10 focus:text-deep-clay py-3 cursor-pointer"
+                        >
+                          <span className="flex items-center gap-3">
+                            <TypeIcon className="w-4 h-4 text-terracotta" />
+                            <span>{exp.title}</span>
+                            <span className="ml-auto text-terracotta font-medium">{exp.price}</span>
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
-            </div>
 
-            {/* Number of Guests */}
-            <div className="space-y-2">
-              <label className="font-sans text-xs tracking-[0.15em] uppercase text-stone-500">
-                Number of People
-              </label>
-              <div className="relative">
-                <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
-                <Input
-                  type="number"
-                  min="1"
-                  max="20"
-                  value={guests}
-                  onChange={(e) => setGuests(e.target.value)}
-                  placeholder="How many guests?"
-                  className="pl-11 bg-stone-900/50 border-stone-700/50 h-14 text-stone-200 placeholder:text-stone-500 focus:ring-orange-500/30 focus:border-orange-500/50"
+              {/* Date & Time Row - Elegant cards */}
+              <div className="grid grid-cols-2 gap-5">
+                {/* Date Picker */}
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2 font-sans text-xs tracking-[0.2em] uppercase text-deep-clay/70">
+                    <Calendar className="w-3.5 h-3.5 text-terracotta/70" />
+                    Date
+                  </label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal bg-white/60 border-terracotta/20 h-14 hover:bg-white/80 hover:border-terracotta/30 rounded-xl transition-all shadow-sm",
+                          !date ? "text-clay/50" : "text-deep-clay"
+                        )}
+                      >
+                        <Calendar className="mr-3 h-4 w-4 text-terracotta/60" />
+                        {date ? format(date, "MMM d, yyyy") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-parchment border-terracotta/20 rounded-xl shadow-xl" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        disabled={(date) => date < new Date()}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {/* Time Slot */}
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2 font-sans text-xs tracking-[0.2em] uppercase text-deep-clay/70">
+                    <Clock className="w-3.5 h-3.5 text-terracotta/70" />
+                    Time
+                  </label>
+                  <Select value={timeSlot} onValueChange={setTimeSlot}>
+                    <SelectTrigger className="bg-white/60 border-terracotta/20 h-14 text-deep-clay focus:ring-terracotta/30 focus:border-terracotta/40 rounded-xl hover:border-terracotta/30 transition-colors shadow-sm">
+                      <SelectValue placeholder="Select time" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-parchment border-terracotta/20 rounded-xl shadow-xl">
+                      {timeSlots.map((slot) => (
+                        <SelectItem 
+                          key={slot} 
+                          value={slot}
+                          className="text-deep-clay focus:bg-terracotta/10 focus:text-deep-clay py-3 cursor-pointer"
+                        >
+                          {slot}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Number of Guests - Card style */}
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 font-sans text-xs tracking-[0.2em] uppercase text-deep-clay/70">
+                  <Users className="w-3.5 h-3.5 text-terracotta/70" />
+                  Number of People
+                </label>
+                <div className="relative">
+                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-terracotta/50" />
+                  <Input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={guests}
+                    onChange={(e) => setGuests(e.target.value)}
+                    placeholder="How many guests will join?"
+                    className="pl-12 bg-white/60 border-terracotta/20 h-14 text-deep-clay placeholder:text-clay/40 focus:ring-terracotta/30 focus:border-terracotta/40 rounded-xl hover:border-terracotta/30 transition-colors shadow-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Notes - Elegant textarea */}
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 font-sans text-xs tracking-[0.2em] uppercase text-deep-clay/70">
+                  <Heart className="w-3.5 h-3.5 text-terracotta/70" />
+                  Special Requests 
+                  <span className="text-clay/50 normal-case tracking-normal text-[10px]">(optional)</span>
+                </label>
+                <Textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Tell us about your occasion, any special requirements, or how we can make this experience memorable..."
+                  rows={4}
+                  className="bg-white/60 border-terracotta/20 text-deep-clay placeholder:text-clay/40 resize-none focus:ring-terracotta/30 focus:border-terracotta/40 rounded-xl hover:border-terracotta/30 transition-colors shadow-sm"
                 />
               </div>
-            </div>
 
-            {/* Notes */}
-            <div className="space-y-2">
-              <label className="font-sans text-xs tracking-[0.15em] uppercase text-stone-500">
-                Special Requests <span className="text-stone-600 normal-case">(optional)</span>
-              </label>
-              <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Tell us about your occasion..."
-                rows={3}
-                className="bg-stone-900/50 border-stone-700/50 text-stone-200 placeholder:text-stone-500 resize-none focus:ring-orange-500/30 focus:border-orange-500/50"
-              />
-            </div>
-
-            {/* Total Amount */}
-            <AnimatePresence>
-              {selectedExperience && guests && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="bg-gradient-to-r from-orange-500/10 via-amber-500/5 to-transparent rounded-2xl p-6 border border-orange-500/20"
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="text-stone-400 text-sm">Total Amount</span>
-                    <span className="font-serif text-3xl text-stone-100">
-                      ₹{totalAmount.toLocaleString()}
-                    </span>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Submit button */}
-            <Button
-              type="submit"
-              disabled={isSubmitting || !user}
-              className="w-full py-7 text-xs tracking-[0.2em] uppercase font-sans bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white shadow-lg shadow-orange-500/20 transition-all duration-300 rounded-xl"
-            >
-              {isSubmitting ? (
-                <span className="flex items-center justify-center gap-3">
-                  <motion.span
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              {/* Total Amount - Premium display */}
+              <AnimatePresence>
+                {selectedExperience && guests && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0, y: 10 }}
+                    animate={{ opacity: 1, height: 'auto', y: 0 }}
+                    exit={{ opacity: 0, height: 0, y: -10 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    className="pt-4"
                   >
-                    ◌
-                  </motion.span>
-                  Processing...
-                </span>
-              ) : user ? (
-                <span className="flex items-center justify-center gap-3">
-                  Complete Booking
-                  <ArrowRight className="w-4 h-4" />
-                </span>
-              ) : (
-                "Sign In to Book"
-              )}
-            </Button>
+                    <div className="relative bg-gradient-to-r from-deep-clay via-deep-clay to-clay/90 rounded-2xl p-6 overflow-hidden">
+                      {/* Decorative shimmer */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse" />
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-terracotta/20 rounded-full blur-2xl" />
+                      
+                      <div className="relative flex justify-between items-center">
+                        <div>
+                          <span className="block text-parchment/60 text-xs tracking-wide uppercase mb-1">Total Amount</span>
+                          <span className="text-parchment/80 text-sm">{selectedExp?.title}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-serif text-4xl md:text-5xl text-parchment">
+                            ₹{totalAmount.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Submit button - Luxurious styling */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={isInView ? { opacity: 1 } : {}}
+                transition={{ delay: 0.6 }}
+                className="pt-4"
+              >
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || !user}
+                  className="w-full py-7 text-sm tracking-[0.2em] uppercase font-sans bg-gradient-to-r from-terracotta via-terracotta to-terracotta/90 hover:from-terracotta/95 hover:via-terracotta/90 hover:to-terracotta/85 text-white shadow-xl shadow-terracotta/30 hover:shadow-2xl hover:shadow-terracotta/40 transition-all duration-500 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
+                >
+                  {/* Button shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-3 relative">
+                      <motion.span
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                      />
+                      Processing...
+                    </span>
+                  ) : user ? (
+                    <span className="flex items-center justify-center gap-3 relative">
+                      Complete Booking
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  ) : (
+                    <span className="relative">Sign In to Book</span>
+                  )}
+                </Button>
+                
+                {/* Security note */}
+                <p className="text-center text-clay/50 text-xs mt-4 flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 rounded-full border border-clay/30 flex items-center justify-center">
+                    <span className="w-1.5 h-1.5 bg-clay/40 rounded-full" />
+                  </span>
+                  Secure payment powered by Razorpay
+                </p>
+              </motion.div>
+            </div>
           </motion.form>
         </div>
       </section>
@@ -665,45 +741,6 @@ const BookingSection = () => {
 };
 
 // Statistics section
-const StatsSection = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-  const stats = [
-    { number: "500+", label: "Happy Couples" },
-    { number: "150+", label: "Birthday Parties" },
-    { number: "50+", label: "Corporate Events" },
-    { number: "4.9", label: "Average Rating" }
-  ];
-
-  return (
-    <section 
-      ref={ref} 
-      className="py-20 border-y border-border/20 bg-card"
-    >
-      <div className="container max-w-5xl mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="text-center"
-            >
-              <span className="block font-serif text-4xl md:text-5xl mb-2 text-foreground">
-                {stat.number}
-              </span>
-              <span className="text-sm tracking-wide text-muted-foreground">
-                {stat.label}
-              </span>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
 
 // Main component
 const Experiences = () => {
@@ -741,7 +778,7 @@ const Experiences = () => {
       {/* Hero Section - Matching Workshops page */}
       <section 
         ref={heroRef} 
-        className="relative min-h-[90vh] flex items-center justify-center overflow-hidden"
+        className="relative min-h-[100vh] pb-32 flex items-center justify-center overflow-hidden"
       >
         {/* Parallax Background Image */}
         <motion.div 
@@ -754,11 +791,14 @@ const Experiences = () => {
             className="w-full h-full object-cover"
           />
           {/* Cinematic gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-b from-charcoal/60 via-charcoal/40 to-charcoal/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-charcoal/60 via-charcoal/40 to-charcoal/70" />
           <div className="absolute inset-0 bg-gradient-to-r from-charcoal/50 via-transparent to-charcoal/50" />
           {/* Vignette effect */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_hsl(var(--charcoal)/0.4)_100%)]" />
         </motion.div>
+        
+        {/* Bottom gradient transition to next section */}
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background via-background/80 to-transparent z-[5]" />
 
         {/* Floating decorative elements */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -896,13 +936,11 @@ const Experiences = () => {
         </motion.div>
       </section>
 
-      {/* Stats Section */}
-      <StatsSection />
 
       {/* Experience Cards Grid */}
       <section 
         id="experiences" 
-        className="py-20 md:py-32 bg-gradient-to-b from-background via-card to-background relative overflow-hidden"
+        className="-mt-20 pt-8 pb-20 md:pb-32 bg-gradient-to-b from-background via-card to-background relative overflow-hidden"
       >
         {/* Ambient glow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

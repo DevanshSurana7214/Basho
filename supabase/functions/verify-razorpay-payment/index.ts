@@ -210,6 +210,30 @@ serve(async (req) => {
     // Clear verification attempts on success
     verificationAttempts.delete(order_id);
 
+    // Automatically generate invoice for all orders after payment
+    console.log('Auto-generating invoice for order:', order_id);
+    try {
+      const invoiceResponse = await fetch(`${supabaseUrl}/functions/v1/generate-gst-invoice`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseServiceKey}`,
+        },
+        body: JSON.stringify({ order_id }),
+      });
+      
+      if (invoiceResponse.ok) {
+        const invoiceData = await invoiceResponse.json();
+        console.log('Invoice generated automatically:', invoiceData);
+      } else {
+        const errorText = await invoiceResponse.text();
+        console.error('Failed to generate invoice:', errorText);
+      }
+    } catch (invoiceError) {
+      console.error('Error auto-generating invoice:', invoiceError);
+      // Don't fail the payment verification if invoice generation fails
+    }
+
     return new Response(JSON.stringify({ success: true, verified: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

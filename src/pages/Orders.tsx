@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { Package, ChevronDown, ChevronUp, Palette, Sparkles, Calendar, Clock, Users } from 'lucide-react';
+import { Package, ChevronDown, ChevronUp, Palette, Sparkles, Calendar, Clock, Users, FileText, Download, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,14 @@ interface Order {
   order_status: string;
   shipping_address: string;
   order_items: OrderItem[];
+  buyer_gstin: string | null;
+  buyer_state: string | null;
+  cgst_amount: number | null;
+  sgst_amount: number | null;
+  igst_amount: number | null;
+  taxable_amount: number | null;
+  invoice_url: string | null;
+  invoice_number: string | null;
 }
 
 interface CustomOrder {
@@ -104,6 +113,14 @@ export default function Orders() {
           payment_status,
           order_status,
           shipping_address,
+          buyer_gstin,
+          buyer_state,
+          cgst_amount,
+          sgst_amount,
+          igst_amount,
+          taxable_amount,
+          invoice_url,
+          invoice_number,
           order_items (
             id,
             item_name,
@@ -298,6 +315,31 @@ export default function Orders() {
                                     <span className="text-muted-foreground">Subtotal</span>
                                     <span>₹{order.subtotal.toLocaleString()}</span>
                                   </div>
+                                  {order.buyer_gstin && order.taxable_amount && (
+                                    <>
+                                      <div className="flex justify-between text-xs text-muted-foreground">
+                                        <span>Taxable Amount</span>
+                                        <span>₹{Number(order.taxable_amount).toLocaleString()}</span>
+                                      </div>
+                                      {order.igst_amount && Number(order.igst_amount) > 0 ? (
+                                        <div className="flex justify-between text-xs text-muted-foreground">
+                                          <span>IGST (18%)</span>
+                                          <span>₹{Number(order.igst_amount).toLocaleString()}</span>
+                                        </div>
+                                      ) : (
+                                        <>
+                                          <div className="flex justify-between text-xs text-muted-foreground">
+                                            <span>CGST (9%)</span>
+                                            <span>₹{Number(order.cgst_amount || 0).toLocaleString()}</span>
+                                          </div>
+                                          <div className="flex justify-between text-xs text-muted-foreground">
+                                            <span>SGST (9%)</span>
+                                            <span>₹{Number(order.sgst_amount || 0).toLocaleString()}</span>
+                                          </div>
+                                        </>
+                                      )}
+                                    </>
+                                  )}
                                   <div className="flex justify-between">
                                     <span className="text-muted-foreground">Shipping</span>
                                     <span>{order.shipping_cost > 0 ? `₹${order.shipping_cost.toLocaleString()}` : 'Free'}</span>
@@ -307,6 +349,33 @@ export default function Orders() {
                                     <span>₹{order.total_amount.toLocaleString()}</span>
                                   </div>
                                 </div>
+
+                                {order.buyer_gstin && (
+                                  <div className="bg-muted/50 rounded-lg p-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <FileText className="w-4 h-4 text-primary" />
+                                      <span className="font-medium text-sm">GST Invoice</span>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mb-2">
+                                      GSTIN: {order.buyer_gstin}
+                                      {order.buyer_state && ` • ${order.buyer_state}`}
+                                    </p>
+                                    {order.invoice_url ? (
+                                      <a 
+                                        href={order.invoice_url} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                      >
+                                        <Button size="sm" variant="outline" className="gap-2">
+                                          <Download className="w-3 h-3" />
+                                          Download Invoice {order.invoice_number && `(${order.invoice_number})`}
+                                        </Button>
+                                      </a>
+                                    ) : (
+                                      <p className="text-xs text-muted-foreground italic">Invoice being generated...</p>
+                                    )}
+                                  </div>
+                                )}
 
                                 {order.shipping_address && (
                                   <div>

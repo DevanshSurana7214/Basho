@@ -100,6 +100,72 @@ export type Database = {
           },
         ]
       }
+      business_settings: {
+        Row: {
+          address_line1: string
+          address_line2: string | null
+          bank_account_number: string | null
+          bank_branch: string | null
+          bank_ifsc: string | null
+          bank_name: string | null
+          city: string
+          created_at: string
+          email: string | null
+          gstin: string | null
+          id: string
+          legal_name: string
+          pan: string | null
+          phone: string | null
+          pincode: string
+          state: string
+          state_code: string
+          trade_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          address_line1: string
+          address_line2?: string | null
+          bank_account_number?: string | null
+          bank_branch?: string | null
+          bank_ifsc?: string | null
+          bank_name?: string | null
+          city: string
+          created_at?: string
+          email?: string | null
+          gstin?: string | null
+          id?: string
+          legal_name: string
+          pan?: string | null
+          phone?: string | null
+          pincode: string
+          state: string
+          state_code: string
+          trade_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address_line1?: string
+          address_line2?: string | null
+          bank_account_number?: string | null
+          bank_branch?: string | null
+          bank_ifsc?: string | null
+          bank_name?: string | null
+          city?: string
+          created_at?: string
+          email?: string | null
+          gstin?: string | null
+          id?: string
+          legal_name?: string
+          pan?: string | null
+          phone?: string | null
+          pincode?: string
+          state?: string
+          state_code?: string
+          trade_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string | null
@@ -373,61 +439,91 @@ export type Database = {
       }
       orders: {
         Row: {
+          buyer_gstin: string | null
+          buyer_state: string | null
+          buyer_state_code: string | null
+          cgst_amount: number | null
           created_at: string | null
           customer_email: string
           customer_name: string
           customer_phone: string | null
           gst_number: string | null
           id: string
+          igst_amount: number | null
+          invoice_generated_at: string | null
+          invoice_number: string | null
+          invoice_url: string | null
           order_number: string
           order_status: string | null
           payment_status: string | null
           razorpay_order_id: string | null
           razorpay_payment_id: string | null
           session_id: string | null
+          sgst_amount: number | null
           shipping_address: string | null
           shipping_cost: number | null
           subtotal: number
+          taxable_amount: number | null
           total_amount: number
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
+          buyer_gstin?: string | null
+          buyer_state?: string | null
+          buyer_state_code?: string | null
+          cgst_amount?: number | null
           created_at?: string | null
           customer_email: string
           customer_name: string
           customer_phone?: string | null
           gst_number?: string | null
           id?: string
+          igst_amount?: number | null
+          invoice_generated_at?: string | null
+          invoice_number?: string | null
+          invoice_url?: string | null
           order_number: string
           order_status?: string | null
           payment_status?: string | null
           razorpay_order_id?: string | null
           razorpay_payment_id?: string | null
           session_id?: string | null
+          sgst_amount?: number | null
           shipping_address?: string | null
           shipping_cost?: number | null
           subtotal: number
+          taxable_amount?: number | null
           total_amount: number
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
+          buyer_gstin?: string | null
+          buyer_state?: string | null
+          buyer_state_code?: string | null
+          cgst_amount?: number | null
           created_at?: string | null
           customer_email?: string
           customer_name?: string
           customer_phone?: string | null
           gst_number?: string | null
           id?: string
+          igst_amount?: number | null
+          invoice_generated_at?: string | null
+          invoice_number?: string | null
+          invoice_url?: string | null
           order_number?: string
           order_status?: string | null
           payment_status?: string | null
           razorpay_order_id?: string | null
           razorpay_payment_id?: string | null
           session_id?: string | null
+          sgst_amount?: number | null
           shipping_address?: string | null
           shipping_cost?: number | null
           subtotal?: number
+          taxable_amount?: number | null
           total_amount?: number
           updated_at?: string | null
           user_id?: string | null
@@ -478,6 +574,7 @@ export type Database = {
           category: string
           created_at: string | null
           description: string | null
+          hsn_code: string | null
           id: string
           image_url: string | null
           in_stock: boolean | null
@@ -491,6 +588,7 @@ export type Database = {
           category: string
           created_at?: string | null
           description?: string | null
+          hsn_code?: string | null
           id?: string
           image_url?: string | null
           in_stock?: boolean | null
@@ -504,6 +602,7 @@ export type Database = {
           category?: string
           created_at?: string | null
           description?: string | null
+          hsn_code?: string | null
           id?: string
           image_url?: string | null
           in_stock?: boolean | null

@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.send-workshop-confirmation]
 verify_jwt = false
+
+[functions.generate-gst-invoice]
+verify_jwt = false

@@ -33,6 +33,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import ProductOrdersView from '@/components/admin/ProductOrdersView';
 
 interface Product {
   id: string;
@@ -84,6 +85,10 @@ const AdminProducts = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
+  
+  // Product orders view state
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showOrdersView, setShowOrdersView] = useState(false);
 
   const { data: products, isLoading } = useQuery({
     queryKey: ['admin-products'],
@@ -270,6 +275,16 @@ const AdminProducts = () => {
     }
   };
 
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setShowOrdersView(true);
+  };
+
+  const handleBackFromOrders = () => {
+    setShowOrdersView(false);
+    setSelectedProduct(null);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -278,6 +293,16 @@ const AdminProducts = () => {
           <p className="text-muted-foreground">Loading products...</p>
         </div>
       </div>
+    );
+  }
+
+  // If showing orders view, render that instead
+  if (showOrdersView && selectedProduct) {
+    return (
+      <ProductOrdersView
+        product={selectedProduct}
+        onBack={handleBackFromOrders}
+      />
     );
   }
 
@@ -355,7 +380,8 @@ const AdminProducts = () => {
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ delay: index * 0.02 }}
                 layout
-                className="group relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:border-primary/20"
+                onClick={() => handleProductClick(product)}
+                className="group relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:border-primary/20 cursor-pointer"
               >
                 {/* Product Image */}
                 <div className="aspect-square relative overflow-hidden bg-muted/30">
@@ -390,7 +416,10 @@ const AdminProducts = () => {
                         size="icon"
                         variant="secondary"
                         className="h-7 w-7 bg-white/90 hover:bg-white text-foreground shadow-md"
-                        onClick={() => handleOpenEdit(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEdit(product);
+                        }}
                       >
                         <Pencil className="h-3 w-3" />
                       </Button>
@@ -398,7 +427,10 @@ const AdminProducts = () => {
                         size="icon"
                         variant="secondary"
                         className="h-7 w-7 bg-white/90 hover:bg-red-500 hover:text-white text-foreground shadow-md transition-colors"
-                        onClick={() => handleDelete(product.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(product.id);
+                        }}
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>

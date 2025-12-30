@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+import { SMTPClient, Attachment } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -155,6 +155,49 @@ serve(async (req: Request): Promise<Response> => {
       throw itemsError;
     }
 
+    // Generate invoice if GSTIN is provided and invoice doesn't exist
+    let invoicePdfBytes: Uint8Array | null = null;
+    let invoiceFileName: string | null = null;
+    
+    if (order.buyer_gstin) {
+      console.log('Order has GSTIN, generating invoice...');
+      
+      // Call the generate-gst-invoice function internally
+      try {
+        const invoiceResponse = await fetch(`${supabaseUrl}/functions/v1/generate-gst-invoice`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseServiceKey}`,
+          },
+          body: JSON.stringify({ order_id }),
+        });
+        
+        if (invoiceResponse.ok) {
+          const invoiceData = await invoiceResponse.json();
+          console.log('Invoice generated:', invoiceData);
+          
+          // Fetch the invoice PDF to attach to email
+          if (invoiceData.invoice_url) {
+            const pdfResponse = await fetch(invoiceData.invoice_url);
+            if (pdfResponse.ok) {
+              invoicePdfBytes = new Uint8Array(await pdfResponse.arrayBuffer());
+              invoiceFileName = `${invoiceData.invoice_number}.pdf`;
+              console.log('Invoice PDF fetched for email attachment');
+              
+              // Update order with invoice details
+              order.invoice_url = invoiceData.invoice_url;
+              order.invoice_number = invoiceData.invoice_number;
+            }
+          }
+        } else {
+          console.error('Failed to generate invoice:', await invoiceResponse.text());
+        }
+      } catch (invoiceError) {
+        console.error('Error generating invoice:', invoiceError);
+      }
+    }
+
     // Build items HTML
     const itemsHtml = orderItems.map((item: { item_name: string; quantity: number; unit_price: number; total_price: number; item_type: string }) => `
       <tr>
@@ -197,7 +240,7 @@ serve(async (req: Request): Promise<Response> => {
               
               <tr><td style="padding: 32px;">
                 <h2 style="color: #292524; margin: 0 0 8px 0;">Thank you for your order, ${customer_name}!</h2>
-                <p style="color: #78716c; margin: 0 0 24px 0;">Your order has been confirmed and is being processed.</p>
+                <p style="color: #78716c; margin: 0 0 24px 0;">Your order has been confirmed and is being processed.${invoicePdfBytes ? ' Your GST invoice is attached to this email.' : ''}</p>
                 
                 <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f4; border-radius: 8px; margin-bottom: 24px;">
                   <tr><td style="padding: 16px;">
@@ -207,6 +250,7 @@ serve(async (req: Request): Promise<Response> => {
                       month: 'long', 
                       day: 'numeric' 
                     })}</p>
+                    ${order.invoice_number ? `<p style="margin: 8px 0 0 0; color: #57534e;"><strong>Invoice Number:</strong> ${order.invoice_number}</p>` : ''}
                   </td></tr>
                 </table>
 
@@ -233,6 +277,27 @@ serve(async (req: Request): Promise<Response> => {
                     <td style="color: #78716c; padding: 4px 0;">Subtotal:</td>
                     <td style="color: #292524; text-align: right; padding: 4px 0;">₹${order.subtotal.toLocaleString()}</td>
                   </tr>
+                  ${order.buyer_gstin && order.taxable_amount ? `
+                    <tr>
+                      <td style="color: #78716c; padding: 4px 0; font-size: 12px;">Taxable Amount:</td>
+                      <td style="color: #292524; text-align: right; padding: 4px 0; font-size: 12px;">₹${Number(order.taxable_amount).toLocaleString()}</td>
+                    </tr>
+                    ${order.igst_amount && Number(order.igst_amount) > 0 ? `
+                      <tr>
+                        <td style="color: #78716c; padding: 4px 0; font-size: 12px;">IGST (18%):</td>
+                        <td style="color: #292524; text-align: right; padding: 4px 0; font-size: 12px;">₹${Number(order.igst_amount).toLocaleString()}</td>
+                      </tr>
+                    ` : `
+                      <tr>
+                        <td style="color: #78716c; padding: 4px 0; font-size: 12px;">CGST (9%):</td>
+                        <td style="color: #292524; text-align: right; padding: 4px 0; font-size: 12px;">₹${Number(order.cgst_amount || 0).toLocaleString()}</td>
+                      </tr>
+                      <tr>
+                        <td style="color: #78716c; padding: 4px 0; font-size: 12px;">SGST (9%):</td>
+                        <td style="color: #292524; text-align: right; padding: 4px 0; font-size: 12px;">₹${Number(order.sgst_amount || 0).toLocaleString()}</td>
+                      </tr>
+                    `}
+                  ` : ''}
                   <tr>
                     <td style="color: #78716c; padding: 4px 0;">Shipping:</td>
                     <td style="color: #292524; text-align: right; padding: 4px 0;">₹${(order.shipping_cost || 0).toLocaleString()}</td>
@@ -242,6 +307,23 @@ serve(async (req: Request): Promise<Response> => {
                     <td style="color: #292524; font-size: 18px; font-weight: bold; text-align: right; padding: 12px 0 0 0; border-top: 1px solid #e5e5e5;">₹${order.total_amount.toLocaleString()}</td>
                   </tr>
                 </table>
+
+                ${order.buyer_gstin ? `
+                  <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 20px; background-color: #ecfdf5; border: 1px solid #10b981; border-radius: 8px;">
+                    <tr><td style="padding: 16px;">
+                      <h4 style="margin: 0 0 8px 0; color: #065f46;">GST Invoice ${invoicePdfBytes ? 'Attached' : 'Details'}</h4>
+                      <p style="margin: 0 0 4px 0; color: #047857; font-size: 14px;"><strong>GSTIN:</strong> ${order.buyer_gstin}</p>
+                      ${order.buyer_state ? `<p style="margin: 0 0 8px 0; color: #047857; font-size: 14px;"><strong>State:</strong> ${order.buyer_state}</p>` : ''}
+                      ${invoicePdfBytes ? `
+                        <p style="margin: 8px 0 0 0; color: #065f46; font-size: 12px;">📎 Your GST invoice (${invoiceFileName}) is attached to this email.</p>
+                      ` : order.invoice_url ? `
+                        <a href="${order.invoice_url}" target="_blank" style="display: inline-block; background-color: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-size: 14px; margin-top: 8px;">Download GST Invoice</a>
+                      ` : `
+                        <p style="margin: 8px 0 0 0; color: #065f46; font-size: 12px; font-style: italic;">Your GST invoice is being generated and will be available soon on your orders page.</p>
+                      `}
+                    </td></tr>
+                  </table>
+                ` : ''}
 
                 ${order.shipping_address ? `
                   <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 24px; background-color: #f5f5f4; border-radius: 8px;">
@@ -296,14 +378,29 @@ serve(async (req: Request): Promise<Response> => {
     });
 
     try {
-      await client.send({
+      // Prepare email options with optional attachment
+      const emailOptions: any = {
         from: `Basho Byy Shivangi <${gmailUser}>`,
         to: customer_email,
-        subject: `Order Confirmed - ${order.order_number}`,
+        subject: `Order Confirmed - ${order.order_number}${order.invoice_number ? ` | Invoice ${order.invoice_number}` : ''}`,
         html: emailHtml,
-      });
+      };
 
-      console.log("Order confirmation email sent successfully to:", customer_email);
+      // Add PDF attachment if available
+      if (invoicePdfBytes && invoiceFileName) {
+        emailOptions.attachments = [
+          {
+            filename: invoiceFileName,
+            content: invoicePdfBytes,
+            contentType: 'application/pdf',
+          },
+        ];
+        console.log('Attaching invoice PDF to email:', invoiceFileName);
+      }
+
+      await client.send(emailOptions);
+
+      console.log("Order confirmation email sent successfully to:", customer_email, invoicePdfBytes ? 'with invoice attached' : 'without invoice');
     } finally {
       try {
         await client.close();
@@ -318,7 +415,7 @@ serve(async (req: Request): Promise<Response> => {
       .insert({
         type: 'order',
         title: 'New Order Received',
-        message: `Order #${order.order_number} from ${customer_name} for ₹${order.total_amount.toLocaleString()}`,
+        message: `Order #${order.order_number} from ${customer_name} for ₹${order.total_amount.toLocaleString()}${order.buyer_gstin ? ' (GST Invoice)' : ''}`,
         order_id: order.id,
       });
 
@@ -328,7 +425,7 @@ serve(async (req: Request): Promise<Response> => {
       console.log('Admin notification created for order:', order.order_number);
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ success: true, invoice_attached: !!invoicePdfBytes }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });

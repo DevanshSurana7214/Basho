@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Package, ShoppingCart, Users, Calendar, LayoutDashboard, LogOut, Paintbrush, Sparkles, Building2, Video, ChevronRight, ExternalLink, TrendingUp, TrendingDown } from 'lucide-react';
+import { Package, ShoppingCart, Users, Calendar, LayoutDashboard, LogOut, Paintbrush, Sparkles, Building2, Video, ChevronRight, ExternalLink, TrendingUp, TrendingDown, Settings } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -15,9 +15,10 @@ import AdminCustomOrders from './AdminCustomOrders';
 import AdminExperiences from './AdminExperiences';
 import AdminCorporateInquiries from './AdminCorporateInquiries';
 import AdminVideoTestimonials from './AdminVideoTestimonials';
+import AdminSettings from './AdminSettings';
 import AdminNotifications from '@/components/admin/AdminNotifications';
 
-type Tab = 'overview' | 'products' | 'orders' | 'workshops' | 'users' | 'custom-orders' | 'experiences' | 'corporate' | 'testimonials';
+type Tab = 'overview' | 'products' | 'orders' | 'workshops' | 'users' | 'custom-orders' | 'experiences' | 'corporate' | 'testimonials' | 'settings';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
@@ -40,6 +41,7 @@ const AdminDashboard = () => {
     { id: 'corporate' as Tab, label: 'Corporate', icon: Building2 },
     { id: 'testimonials' as Tab, label: 'Testimonials', icon: Video },
     { id: 'users' as Tab, label: 'Users', icon: Users },
+    { id: 'settings' as Tab, label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -206,6 +208,7 @@ const AdminDashboard = () => {
             {activeTab === 'corporate' && <AdminCorporateInquiries />}
             {activeTab === 'testimonials' && <AdminVideoTestimonials />}
             {activeTab === 'users' && <AdminUsers />}
+            {activeTab === 'settings' && <AdminSettings />}
           </motion.div>
         </main>
       </div>

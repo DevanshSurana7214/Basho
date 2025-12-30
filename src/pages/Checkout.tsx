@@ -12,11 +12,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Plus, MapPin, Package, CreditCard, FileText, Check, ChevronRight, Shield } from 'lucide-react';
+import { Loader2, Plus, MapPin, Package, CreditCard, FileText, Check, ChevronRight, Shield, AlertCircle } from 'lucide-react';
 import AddressForm from '@/components/AddressForm';
 import PaymentProcessingOverlay from '@/components/PaymentProcessingOverlay';
+import { indianStates, validateGSTIN, calculateGST, getStateByCode } from '@/lib/indianStates';
 
 declare global {
   interface Window {
@@ -43,7 +45,26 @@ export default function Checkout() {
     email: '',
     phone: '',
     gstNumber: '',
+    buyerState: '',
+    buyerStateCode: '',
   });
+  const [gstError, setGstError] = useState<string | null>(null);
+  const [businessSettings, setBusinessSettings] = useState<{ state_code: string } | null>(null);
+
+  // Fetch business settings for GST calculation
+  useEffect(() => {
+    const fetchBusinessSettings = async () => {
+      const { data } = await supabase
+        .from('business_settings')
+        .select('state_code')
+        .limit(1)
+        .single();
+      if (data) {
+        setBusinessSettings(data);
+      }
+    };
+    fetchBusinessSettings();
+  }, []);
 
   const subtotal = getTotal();
   const shipping = getShippingCost();
@@ -91,8 +112,47 @@ export default function Checkout() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Validate GSTIN and auto-extract state
+    if (name === 'gstNumber') {
+      if (value) {
+        const validation = validateGSTIN(value);
+        setGstError(validation.valid ? null : validation.error || null);
+        if (validation.valid && validation.stateCode) {
+          const state = getStateByCode(validation.stateCode);
+          if (state) {
+            setFormData(prev => ({ 
+              ...prev, 
+              [name]: value,
+              buyerState: state.name, 
+              buyerStateCode: state.code 
+            }));
+          }
+        }
+      } else {
+        setGstError(null);
+        setFormData(prev => ({ ...prev, [name]: value, buyerState: '', buyerStateCode: '' }));
+      }
+    }
   };
+
+  const handleBuyerStateChange = (value: string) => {
+    const state = indianStates.find(s => s.code === value);
+    if (state) {
+      setFormData(prev => ({ 
+        ...prev, 
+        buyerState: state.name, 
+        buyerStateCode: state.code 
+      }));
+    }
+  };
+
+  // Calculate GST breakdown
+  const gstBreakdown = formData.gstNumber && formData.buyerStateCode && businessSettings?.state_code
+    ? calculateGST(subtotal, formData.buyerStateCode, businessSettings.state_code)
+    : null;
 
   const handleAddAddress = async (data: AddressFormData) => {
     setSavingAddress(true);
@@ -108,7 +168,6 @@ export default function Checkout() {
     }
     setSavingAddress(false);
   };
-
   const getSelectedAddress = (): Address | null => {
     return addresses.find(a => a.id === selectedAddressId) || null;
   };
@@ -174,6 +233,13 @@ export default function Checkout() {
           customer_phone: selectedAddress?.phone || formData.phone,
           shipping_address: shippingAddressString,
           gst_number: formData.gstNumber || null,
+          buyer_gstin: formData.gstNumber || null,
+          buyer_state: formData.buyerState || null,
+          buyer_state_code: formData.buyerStateCode || null,
+          taxable_amount: subtotal,
+          cgst_amount: gstBreakdown?.cgst || 0,
+          sgst_amount: gstBreakdown?.sgst || 0,
+          igst_amount: gstBreakdown?.igst || 0,
           subtotal,
           shipping_cost: shipping,
           total_amount: total,
@@ -526,11 +592,11 @@ export default function Checkout() {
                   </div>
                   <div>
                     <h2 className="font-serif text-lg">GST Details</h2>
-                    <p className="text-xs text-muted-foreground">Optional - For business invoices</p>
+                    <p className="text-xs text-muted-foreground">Optional - For business invoices with GST</p>
                   </div>
                 </div>
                 
-                <div className="p-6">
+                <div className="p-6 space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="gstNumber" className="text-sm">GST Number</Label>
                     <Input 
@@ -538,10 +604,73 @@ export default function Checkout() {
                       name="gstNumber"
                       value={formData.gstNumber}
                       onChange={handleInputChange}
-                      placeholder="e.g., 22AAAAA0000A1Z5"
-                      className="h-11"
+                      placeholder="e.g., 24AAAAA0000A1Z5"
+                      className={`h-11 ${gstError ? 'border-destructive' : ''}`}
                     />
+                    {gstError && (
+                      <p className="text-xs text-destructive flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {gstError}
+                      </p>
+                    )}
                   </div>
+
+                  {formData.gstNumber && !gstError && (
+                    <div className="space-y-2">
+                      <Label className="text-sm">Buyer's State</Label>
+                      <Select 
+                        value={formData.buyerStateCode} 
+                        onValueChange={handleBuyerStateChange}
+                      >
+                        <SelectTrigger className="h-11">
+                          <SelectValue placeholder="Select state" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {indianStates.map(state => (
+                            <SelectItem key={state.code} value={state.code}>
+                              {state.name} ({state.code})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">
+                        State is auto-detected from GSTIN. Change if needed.
+                      </p>
+                    </div>
+                  )}
+
+                  {gstBreakdown && (
+                    <div className="mt-4 p-4 bg-muted/30 rounded-lg space-y-2">
+                      <h4 className="text-sm font-medium mb-2">Tax Breakdown</h4>
+                      {gstBreakdown.cgst > 0 && (
+                        <>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">CGST (9%)</span>
+                            <span>₹{gstBreakdown.cgst.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">SGST (9%)</span>
+                            <span>₹{gstBreakdown.sgst.toFixed(2)}</span>
+                          </div>
+                        </>
+                      )}
+                      {gstBreakdown.igst > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">IGST (18%)</span>
+                          <span>₹{gstBreakdown.igst.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between text-sm font-medium pt-2 border-t border-border/50">
+                        <span>Total Tax</span>
+                        <span>₹{gstBreakdown.total.toFixed(2)}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {gstBreakdown.cgst > 0 
+                          ? 'Intra-state supply (CGST + SGST)' 
+                          : 'Inter-state supply (IGST)'}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -628,6 +757,44 @@ export default function Checkout() {
                       <span className="text-muted-foreground">Subtotal</span>
                       <span>₹{subtotal.toLocaleString()}</span>
                     </div>
+                    
+                    {/* GST Breakdown when GSTIN is entered */}
+                    {gstBreakdown && (
+                      <div className="bg-muted/30 rounded-lg p-3 space-y-2">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">Taxable Amount</span>
+                          <span>₹{subtotal.toLocaleString()}</span>
+                        </div>
+                        {gstBreakdown.cgst > 0 && (
+                          <>
+                            <div className="flex justify-between text-xs">
+                              <span className="text-muted-foreground">CGST (9%)</span>
+                              <span>₹{gstBreakdown.cgst.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                              <span className="text-muted-foreground">SGST (9%)</span>
+                              <span>₹{gstBreakdown.sgst.toFixed(2)}</span>
+                            </div>
+                          </>
+                        )}
+                        {gstBreakdown.igst > 0 && (
+                          <div className="flex justify-between text-xs">
+                            <span className="text-muted-foreground">IGST (18%)</span>
+                            <span>₹{gstBreakdown.igst.toFixed(2)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-xs font-medium pt-1 border-t border-border/50">
+                          <span>Total Tax</span>
+                          <span>₹{gstBreakdown.total.toFixed(2)}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {gstBreakdown.cgst > 0 
+                            ? 'Intra-state supply (CGST + SGST)' 
+                            : 'Inter-state supply (IGST)'}
+                        </p>
+                      </div>
+                    )}
+                    
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Shipping</span>
                       <span className={shipping === 0 ? 'text-green-600' : ''}>
@@ -642,7 +809,7 @@ export default function Checkout() {
                     <span className="font-medium">Total</span>
                     <div className="text-right">
                       <span className="text-2xl font-serif text-primary">₹{total.toLocaleString()}</span>
-                      <p className="text-xs text-muted-foreground">Inclusive of GST</p>
+                      <p className="text-xs text-muted-foreground">{gstBreakdown ? 'GST breakdown shown above' : 'Inclusive of GST'}</p>
                     </div>
                   </div>
 

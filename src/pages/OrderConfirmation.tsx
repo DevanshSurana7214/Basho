@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, LogIn, Loader2 } from 'lucide-react';
+import { CheckCircle, LogIn, Loader2, FileText, Download } from 'lucide-react';
 
 interface Order {
   id: string;
@@ -15,8 +15,18 @@ interface Order {
   customer_name: string;
   customer_email: string;
   total_amount: number;
+  subtotal: number;
+  shipping_cost: number;
   payment_status: string;
   created_at: string;
+  buyer_gstin: string | null;
+  buyer_state: string | null;
+  cgst_amount: number | null;
+  sgst_amount: number | null;
+  igst_amount: number | null;
+  taxable_amount: number | null;
+  invoice_url: string | null;
+  invoice_number: string | null;
 }
 
 export default function OrderConfirmation() {
@@ -260,6 +270,37 @@ export default function OrderConfirmation() {
                   <span className="text-muted-foreground">Email</span>
                   <span>{order.customer_email}</span>
                 </div>
+                
+                {order.buyer_gstin && order.taxable_amount && (
+                  <div className="border-t border-b py-2 my-2 space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">GSTIN</span>
+                      <span>{order.buyer_gstin}</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">Taxable Amount</span>
+                      <span>₹{Number(order.taxable_amount).toLocaleString()}</span>
+                    </div>
+                    {order.igst_amount && Number(order.igst_amount) > 0 ? (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">IGST (18%)</span>
+                        <span>₹{Number(order.igst_amount).toLocaleString()}</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">CGST (9%)</span>
+                          <span>₹{Number(order.cgst_amount || 0).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">SGST (9%)</span>
+                          <span>₹{Number(order.sgst_amount || 0).toLocaleString()}</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+                
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Total Amount</span>
                   <span className="font-medium text-primary">₹{Number(order.total_amount).toLocaleString()}</span>
@@ -268,6 +309,31 @@ export default function OrderConfirmation() {
                   <span className="text-muted-foreground">Payment Status</span>
                   <span className="text-green-600 capitalize">{order.payment_status}</span>
                 </div>
+                
+                {order.buyer_gstin && (
+                  <div className="pt-3 border-t mt-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <FileText className="w-4 h-4 text-primary" />
+                      <span className="font-medium">GST Invoice</span>
+                    </div>
+                    {order.invoice_url ? (
+                      <a 
+                        href={order.invoice_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
+                        <Button size="sm" variant="outline" className="w-full gap-2">
+                          <Download className="w-4 h-4" />
+                          Download Invoice {order.invoice_number && `(${order.invoice_number})`}
+                        </Button>
+                      </a>
+                    ) : (
+                      <p className="text-xs text-muted-foreground italic text-center">
+                        Invoice is being generated and will be available shortly...
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

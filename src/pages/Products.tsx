@@ -399,6 +399,7 @@ const Products = () => {
                                 size="sm" 
                                 variant={product.in_stock ? "terracotta" : "secondary"}
                                 className="w-full backdrop-blur-sm"
+                                disabled={addingToCart === product.id || !product.in_stock}
                                 onClick={(e) => {
                                   e.preventDefault();
                                   e.stopPropagation();
@@ -406,14 +407,13 @@ const Products = () => {
                                     handleAddToCart(product);
                                   }
                                 }}
-                                disabled={addingToCart === product.id || !product.in_stock}
                               >
                                 {addingToCart === product.id ? (
                                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                                 ) : (
                                   <ShoppingBag className="h-4 w-4 mr-2" />
                                 )}
-                                {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
+                                {addingToCart === product.id ? 'Adding...' : (product.in_stock ? 'Add to Cart' : 'Out of Stock')}
                               </Button>
                             </div>
                           </div>

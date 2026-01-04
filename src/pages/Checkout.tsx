@@ -38,6 +38,7 @@ export default function Checkout() {
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [savingAddress, setSavingAddress] = useState(false);
+  const [showAllItems, setShowAllItems] = useState(false);
   
   const [profile, setProfile] = useState<{ full_name: string; phone: string } | null>(null);
   const [formData, setFormData] = useState({
@@ -621,8 +622,9 @@ export default function Checkout() {
                       <Select 
                         value={formData.buyerStateCode} 
                         onValueChange={handleBuyerStateChange}
+                        disabled={!!formData.gstNumber && !gstError}
                       >
-                        <SelectTrigger className="h-11">
+                        <SelectTrigger className="h-11 disabled:opacity-70 disabled:cursor-not-allowed">
                           <SelectValue placeholder="Select state" />
                         </SelectTrigger>
                         <SelectContent>
@@ -634,7 +636,7 @@ export default function Checkout() {
                         </SelectContent>
                       </Select>
                       <p className="text-xs text-muted-foreground">
-                        State is auto-detected from GSTIN. Change if needed.
+                        State is auto-detected from GSTIN and cannot be changed.
                       </p>
                     </div>
                   )}
@@ -716,7 +718,7 @@ export default function Checkout() {
                 <div className="p-6">
                   {/* Cart Items Preview */}
                   <div className="space-y-4 mb-6">
-                    {items.slice(0, 3).map((item) => (
+                    {(showAllItems ? items : items.slice(0, 3)).map((item) => (
                       <div key={item.id} className="flex gap-3">
                         <div className="w-16 h-16 bg-muted rounded-lg flex-shrink-0 overflow-hidden">
                           {(item.product?.image_url || item.workshop?.image_url) ? (
@@ -743,9 +745,16 @@ export default function Checkout() {
                       </div>
                     ))}
                     {items.length > 3 && (
-                      <p className="text-sm text-muted-foreground text-center">
-                        +{items.length - 3} more item{items.length - 3 > 1 ? 's' : ''}
-                      </p>
+                      <button 
+                        type="button"
+                        onClick={() => setShowAllItems(!showAllItems)}
+                        className="w-full text-sm text-primary hover:text-primary/80 text-center py-2 hover:underline underline-offset-2 transition-colors"
+                      >
+                        {showAllItems 
+                          ? 'Show less' 
+                          : `+${items.length - 3} more item${items.length - 3 > 1 ? 's' : ''}`
+                        }
+                      </button>
                     )}
                   </div>
 

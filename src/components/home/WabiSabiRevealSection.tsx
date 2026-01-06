@@ -1,11 +1,21 @@
 import { memo, useMemo, useRef } from "react";
-import { cubicBezier, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import {
+  cubicBezier,
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import bg5 from "../../assets/bg5.png";
 
 const TEXT =
   "In Japanese aesthetics, wabi-sabi finds beauty in imperfection, impermanence, and incompleteness—the philosophy that guides every piece we create.";
 
 const EASE_ELEGANT = cubicBezier(0.25, 0.1, 0.25, 1);
+
+// Reveal should complete slightly before the sticky section ends,
+// so the final words are fully readable before the section scrolls away.
+const REVEAL_COMPLETE_AT = 0.9;
 
 // Using theme tokens (no hard-coded new colors): stone -> warm-white.
 const COLOR_START = "hsl(var(--stone) / 0.35)";
@@ -18,7 +28,12 @@ type RevealWordProps = {
   progress: ReturnType<typeof useScroll>["scrollYProgress"];
 };
 
-const RevealWord = memo(function RevealWord({ word, index, total, progress }: RevealWordProps) {
+const RevealWord = memo(function RevealWord({
+  word,
+  index,
+  total,
+  progress,
+}: RevealWordProps) {
   // Key animation logic:
   // Each word gets its own small scroll segment so the reveal progresses left-to-right.
   // We add a bit of overlap to keep transitions smooth and premium.
@@ -34,7 +49,10 @@ const RevealWord = memo(function RevealWord({ word, index, total, progress }: Re
   });
 
   return (
-    <motion.span style={{ opacity, color, willChange: "opacity, color" }} className="inline-block">
+    <motion.span
+      style={{ opacity, color, willChange: "opacity, color" }}
+      className="inline-block"
+    >
       {word}
     </motion.span>
   );
@@ -53,8 +71,19 @@ export default function WabiSabiRevealSection() {
   // then the section scrolls away naturally.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start start", "end start"],
+    // Map progress to the same window where the sticky content is actually pinned.
+    // With a sticky 100svh child, this is effectively when section top hits top
+    // through when section bottom hits bottom.
+    offset: ["start start", "end end"],
   });
+
+  // Clamp so that by ~90% scroll progress the reveal is fully complete,
+  // leaving a small “hold” where the final words remain solid on screen.
+  const revealProgress = useTransform(
+    scrollYProgress,
+    [0, REVEAL_COMPLETE_AT],
+    [0, 1]
+  );
 
   return (
     <section
@@ -90,7 +119,12 @@ export default function WabiSabiRevealSection() {
               // Screen readers should read the full sentence once; each animated word is aria-hidden.
               words.map((word, i) => (
                 <span key={`${word}-${i}`} aria-hidden="true">
-                  <RevealWord word={word} index={i} total={words.length} progress={scrollYProgress} />
+                  <RevealWord
+                    word={word}
+                    index={i}
+                    total={words.length}
+                    progress={revealProgress}
+                  />
                   {i < words.length - 1 ? " " : null}
                 </span>
               ))

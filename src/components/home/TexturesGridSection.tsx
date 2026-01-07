@@ -5,6 +5,7 @@ import organicEdgePlatters from "@/assets/products/organic-edge-platters.jpg";
 import earthToneServingPlates from "@/assets/products/earth-tone-serving-plates.jpg";
 import rusticDuoMugSet from "@/assets/products/rustic-duo-mug-set.jpg";
 import forestGreenTeaSet from "@/assets/products/forest-green-tea-set.jpg";
+import CeramicDriftCanvas from "./CeramicDriftCanvas";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -88,6 +89,9 @@ const TexturesGridSection = () => {
       ref={sectionRef} 
       className="snap-section py-40 md:py-56 bg-paper relative overflow-hidden"
     >
+      {/* WebGL Background — Ceramic Drift */}
+      <CeramicDriftCanvas sectionRef={sectionRef} />
+
       {/* Grain overlay */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.02] mix-blend-overlay"

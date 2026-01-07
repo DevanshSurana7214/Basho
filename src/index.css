@@ -8,7 +8,7 @@
   :root {
     /* ===== WABI-SABI EARTHY PALETTE ===== */
     /* Deep Clay Brown: #442D1C | Kiln Brown: #652810 | Raw Terracotta: #8E5022 | Warm Rust: #C85428 | Parchment: #EDD8B4 */
-    
+
     /* BACKGROUND & LAYOUT - warm off-white parchment */
     --background: 39 50% 91%;
     --foreground: 22 43% 19%;
@@ -49,12 +49,17 @@
 
     /* ===== CUSTOM SEMANTIC TOKENS ===== */
     /* Brand colors mapped directly */
-    --deep-clay: 22 43% 19%;        /* #442D1C - headings, footer bg */
-    --kiln-brown: 15 73% 23%;       /* #652810 - primary buttons, subheadings */
-    --terracotta: 25 61% 35%;       /* #8E5022 - links, secondary buttons */
-    --warm-rust: 17 66% 47%;        /* #C85428 - hover accents only */
-    --parchment: 39 62% 82%;        /* #EDD8B4 - base reference */
-    
+    --deep-clay: 22 43% 19%;
+    /* #442D1C - headings, footer bg */
+    --kiln-brown: 15 73% 23%;
+    /* #652810 - primary buttons, subheadings */
+    --terracotta: 25 61% 35%;
+    /* #8E5022 - links, secondary buttons */
+    --warm-rust: 17 66% 47%;
+    /* #C85428 - hover accents only */
+    --parchment: 39 62% 82%;
+    /* #EDD8B4 - base reference */
+
     /* Extended palette */
     --clay: 15 73% 23%;
     --sand: 39 45% 84%;
@@ -134,7 +139,7 @@
     --terracotta: 25 50% 50%;
     --warm-rust: 17 55% 55%;
     --parchment: 22 43% 12%;
-    
+
     --clay: 15 55% 45%;
     --sand: 39 30% 28%;
     --stone: 25 40% 42%;
@@ -200,7 +205,12 @@
   /* Global subtle paper grain texture - applied to content areas only, not images/video/navbar */
   /* Use .texture-grain class on specific sections that need it */
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-serif tracking-tight;
     font-weight: 400;
   }
@@ -235,7 +245,7 @@
   .texture-paper {
     position: relative;
   }
-  
+
   .texture-paper::before {
     content: '';
     position: absolute;
@@ -250,7 +260,7 @@
   .texture-clay {
     position: relative;
   }
-  
+
   .texture-clay::before {
     content: '';
     position: absolute;
@@ -265,7 +275,7 @@
   .texture-subtle {
     position: relative;
   }
-  
+
   .texture-subtle::before {
     content: '';
     position: absolute;
@@ -338,6 +348,7 @@
 }
 
 @layer utilities {
+
   /* Slow, refined animations */
   .animate-fade-up {
     animation: fadeUp 1s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
@@ -372,15 +383,41 @@
     will-change: transform;
   }
 
-  .delay-100 { animation-delay: 0.1s; }
-  .delay-200 { animation-delay: 0.2s; }
-  .delay-300 { animation-delay: 0.3s; }
-  .delay-400 { animation-delay: 0.4s; }
-  .delay-500 { animation-delay: 0.5s; }
-  .delay-600 { animation-delay: 0.6s; }
-  .delay-700 { animation-delay: 0.7s; }
-  .delay-800 { animation-delay: 0.8s; }
-  .delay-1000 { animation-delay: 1s; }
+  .delay-100 {
+    animation-delay: 0.1s;
+  }
+
+  .delay-200 {
+    animation-delay: 0.2s;
+  }
+
+  .delay-300 {
+    animation-delay: 0.3s;
+  }
+
+  .delay-400 {
+    animation-delay: 0.4s;
+  }
+
+  .delay-500 {
+    animation-delay: 0.5s;
+  }
+
+  .delay-600 {
+    animation-delay: 0.6s;
+  }
+
+  .delay-700 {
+    animation-delay: 0.7s;
+  }
+
+  .delay-800 {
+    animation-delay: 0.8s;
+  }
+
+  .delay-1000 {
+    animation-delay: 1s;
+  }
 }
 
 @keyframes fadeUp {
@@ -388,6 +425,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -395,8 +433,13 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
@@ -404,6 +447,7 @@
     opacity: 0;
     transform: scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -415,6 +459,7 @@
     opacity: 0;
     transform: translateX(30px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -426,6 +471,7 @@
     opacity: 0;
     transform: translateX(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -437,6 +483,7 @@
     opacity: 0;
     filter: blur(8px);
   }
+
   to {
     opacity: 1;
     filter: blur(0);
@@ -444,9 +491,12 @@
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-8px);
   }
@@ -492,6 +542,7 @@ img {
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }

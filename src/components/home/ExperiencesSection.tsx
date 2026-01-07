@@ -28,7 +28,7 @@ const ExperiencesSection = () => {
   const workshopImages = [beginnerWorkshop, coupleWorkshop];
 
   return (
-    <section ref={ref} className="py-40 md:py-56 bg-muted relative overflow-hidden">
+    <section ref={ref} className="py-16 md:py-24 bg-muted relative overflow-hidden">
       {/* Grain overlay */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.02] mix-blend-overlay"

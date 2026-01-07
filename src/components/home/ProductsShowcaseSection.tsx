@@ -166,8 +166,7 @@ const ProductsShowcaseSection = () => {
 
         const firstTitleLines =
           titleEls[0]?.querySelectorAll<HTMLElement>(".pss-lines");
-        const firstDescLines =
-          descEls[0]?.querySelectorAll<HTMLElement>(".pss-lines");
+        const firstDescLines = descEls[0]?.querySelectorAll<HTMLElement>(".pss-lines");
         if (firstTitleLines) gsap.set(firstTitleLines, { y: 0 });
         if (firstDescLines) gsap.set(firstDescLines, { y: 0 });
       };
@@ -177,14 +176,18 @@ const ProductsShowcaseSection = () => {
       const animateProgress = (newVal: number, oldVal: number): void => {
         const forward = newVal > oldVal;
 
-        const oldTitleLines =
-          titleEls[oldVal]?.querySelectorAll<HTMLElement>(".pss-lines");
-        const newTitleLines =
-          titleEls[newVal]?.querySelectorAll<HTMLElement>(".pss-lines");
-        const oldDescLines =
-          descEls[oldVal]?.querySelectorAll<HTMLElement>(".pss-lines");
-        const newDescLines =
-          descEls[newVal]?.querySelectorAll<HTMLElement>(".pss-lines");
+        const oldTitleLines = titleEls[oldVal]?.querySelectorAll<HTMLElement>(
+          ".pss-lines"
+        );
+        const newTitleLines = titleEls[newVal]?.querySelectorAll<HTMLElement>(
+          ".pss-lines"
+        );
+        const oldDescLines = descEls[oldVal]?.querySelectorAll<HTMLElement>(
+          ".pss-lines"
+        );
+        const newDescLines = descEls[newVal]?.querySelectorAll<HTMLElement>(
+          ".pss-lines"
+        );
 
         if (oldTitleLines) {
           gsap.to(oldTitleLines, {
@@ -360,8 +363,7 @@ const ProductsShowcaseSection = () => {
 
       const lastBg = bgImages[bgImages.length - 1];
       const st = timeline.scrollTrigger;
-      const pinSpacer =
-        st && "spacer" in st ? (st.spacer as Element | null) : null;
+      const pinSpacer = st && "spacer" in st ? (st.spacer as Element | null) : null;
 
       if (lastBg) {
         gsap.fromTo(
@@ -413,112 +415,105 @@ const ProductsShowcaseSection = () => {
         {/* If no real products are available yet, render nothing to avoid mismatched refs/animations. */}
         {slides.length === 0 ? null : (
           <>
-            <div className="pss-bg">
-              <div className="pss-bgWrapper">
-                {slides.map((slide, index) => {
-                  const isFirst = index === 0;
-                  return (
-                    <div
-                      key={slide.id}
-                      ref={(el) => {
-                        bgImageRefs.current[index] = el;
-                      }}
-                      className={`pss-bgImage ${
-                        !isFirst ? "pss-bgImageNotFirst" : ""
-                      }`}
-                      style={
-                        !isFirst
-                          ? cssVars({ "--mask-image": initialMask })
-                          : undefined
-                      }
-                    >
-                      <img src={slide.imageUrl} alt="" />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="pss-textFloating">
-              <div className="pss-wrapperText">
-                <Menu className="pss-menuIcon" />
-              </div>
-            </div>
-
-            <div
-              ref={(el) => {
-                posterRef.current = el;
-              }}
-              className="pss-poster"
-            >
-              <div className="pss-titleWrapper">
-                {slides.map((slide, index) => (
-                  <h3
-                    key={slide.id}
-                    ref={(el) => {
-                      titleRefs.current[index] = el;
-                    }}
-                    className="pss-title"
-                  >
-                    {slide.title}
-                  </h3>
-                ))}
-              </div>
-
-              <div className="pss-imageWrapper">
-                <div className="pss-imageInner">
-                  {slides.map((slide, index) => {
-                    const isFirst = index === 0;
-                    return (
-                      <div
-                        key={slide.id}
-                        ref={(el) => {
-                          posterImageRefs.current[index] = el;
-                        }}
-                        className={`pss-posterImage ${
-                          !isFirst ? "pss-posterImageNotFirst" : ""
-                        }`}
-                        style={
-                          !isFirst
-                            ? cssVars({
-                                "--mask-clip-path": "inset(100% 0 0 0)",
-                              })
-                            : undefined
-                        }
-                      >
-                        <img src={slide.imageUrl} alt="" />
-                      </div>
-                    );
-                  })}
+        <div className="pss-bg">
+          <div className="pss-bgWrapper">
+            {slides.map((slide, index) => {
+              const isFirst = index === 0;
+              return (
+                <div
+                  key={slide.id}
+                  ref={(el) => {
+                    bgImageRefs.current[index] = el;
+                  }}
+                  className={`pss-bgImage ${!isFirst ? "pss-bgImageNotFirst" : ""}`}
+                  style={
+                    !isFirst
+                      ? cssVars({ "--mask-image": initialMask })
+                      : undefined
+                  }
+                >
+                  <img src={slide.imageUrl} alt="" />
                 </div>
-              </div>
+              );
+            })}
+          </div>
+        </div>
 
-              <div className="pss-descWrapper">
-                {slides.map((slide, index) => (
-                  <p
+
+        <div
+          ref={(el) => {
+            posterRef.current = el;
+          }}
+          className="pss-poster"
+        >
+          <div className="pss-titleWrapper">
+            {slides.map((slide, index) => (
+              <h3
+                key={slide.id}
+                ref={(el) => {
+                  titleRefs.current[index] = el;
+                }}
+                className="pss-title"
+              >
+                {slide.title}
+              </h3>
+            ))}
+          </div>
+
+          <div className="pss-imageWrapper">
+            <div className="pss-imageInner">
+              {slides.map((slide, index) => {
+                const isFirst = index === 0;
+                return (
+                  <div
                     key={slide.id}
                     ref={(el) => {
-                      descRefs.current[index] = el;
+                      posterImageRefs.current[index] = el;
                     }}
-                    className="pss-desc"
+                    className={`pss-posterImage ${
+                      !isFirst ? "pss-posterImageNotFirst" : ""
+                    }`}
+                    style={
+                      !isFirst
+                        ? cssVars({
+                            "--mask-clip-path": "inset(100% 0 0 0)",
+                          })
+                        : undefined
+                    }
                   >
-                    {slide.desc}
-                  </p>
-                ))}
-              </div>
+                    <img src={slide.imageUrl} alt="" />
+                  </div>
+                );
+              })}
             </div>
+          </div>
 
-            {/* CTA: appears on the final product only (scrubbed via timeline). */}
-            <div
-              ref={(el) => {
-                ctaRef.current = el;
-              }}
-              className="pss-cta"
-            >
-              <Link to="/products" className="pss-ctaLink">
-                View all products
-              </Link>
-            </div>
+          <div className="pss-descWrapper">
+            {slides.map((slide, index) => (
+              <p
+                key={slide.id}
+                ref={(el) => {
+                  descRefs.current[index] = el;
+                }}
+                className="pss-desc"
+              >
+                {slide.desc}
+              </p>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA: appears on the final product only (scrubbed via timeline). */}
+        <div
+          ref={(el) => {
+            ctaRef.current = el;
+          }}
+          className="pss-cta"
+        >
+          <Link to="/products" className="pss-ctaLink">
+            View all products
+          </Link>
+        </div>
           </>
         )}
       </section>

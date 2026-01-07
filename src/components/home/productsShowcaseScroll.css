@@ -7,6 +7,14 @@
   --pss-secondary-color: #d1ccbf;
   --pss-vw: 1440;
   --pss-multiplier: 100vw;
+
+  /* Reserve vertical space for the CTA so it never overlaps the poster.
+     (Wide + short viewports can otherwise cause overlap.) */
+  --pss-cta-safe-space: clamp(
+    72px,
+    calc(96 / var(--pss-vw) * var(--pss-multiplier)),
+    120px
+  );
 }
 
 .pss-scrollingWrapper {
@@ -89,8 +97,18 @@
 .pss-poster {
   background-color: var(--pss-primary-background-color);
   color: var(--pss-primary-color);
-  height: calc(100% - 76 / var(--pss-vw) * var(--pss-multiplier));
-  max-height: calc(688 / var(--pss-vw) * var(--pss-multiplier));
+
+  /* Keep the poster centered but ensure it never intrudes into the CTA area.
+     The poster height is capped by both its design max and available viewport height
+     minus a reserved CTA-safe area (top and bottom). */
+  height: min(
+    calc(100% - 76 / var(--pss-vw) * var(--pss-multiplier)),
+    max(0px, calc(100% - (var(--pss-cta-safe-space) * 2)))
+  );
+  max-height: min(
+    calc(688 / var(--pss-vw) * var(--pss-multiplier)),
+    max(0px, calc(100% - (var(--pss-cta-safe-space) * 2)))
+  );
   width: 100%;
   max-width: calc(472 / var(--pss-vw) * var(--pss-multiplier));
   z-index: 2;
@@ -116,7 +134,9 @@
 
 .pss-titleWrapper {
   height: calc(44 / var(--pss-vw) * var(--pss-multiplier));
-  margin: 15% auto 10%;
+
+  /* Reduce unused top space so the image area stays large even on wide screens. */
+  margin: clamp(18px, 7%, 44px) auto clamp(16px, 6%, 36px);
   max-width: calc(272 / var(--pss-vw) * var(--pss-multiplier));
   position: relative;
   width: 100%;
@@ -139,7 +159,7 @@
   overflow: hidden;
   position: relative;
   width: 100%;
-  height: calc(263 / var(--pss-vw) * var(--pss-multiplier));
+  height: calc(360 / var(--pss-vw) * var(--pss-multiplier));
 }
 
 .pss-imageInner {
@@ -168,7 +188,7 @@
   overflow: hidden;
   width: 100%;
   max-width: calc(346 / var(--pss-vw) * var(--pss-multiplier));
-  margin-top: 10%;
+  margin-top: clamp(12px, 6%, 32px);
 }
 
 .pss-desc {
@@ -179,6 +199,8 @@
   inset: 0;
   position: absolute;
   text-align: center;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .pss-cta {
@@ -194,7 +216,8 @@
   align-items: center;
   justify-content: center;
   padding: 0.9rem 1.2rem;
-  border: 1px solid color-mix(in srgb, var(--pss-primary-color) 35%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--pss-primary-color) 35%, transparent);
   background: transparent;
   color: var(--pss-primary-color);
   font-size: 0.85rem;
@@ -205,11 +228,15 @@
 }
 
 .pss-ctaLink:hover {
-  background: color-mix(in srgb, var(--pss-primary-background-color) 70%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--pss-primary-background-color) 70%,
+    transparent
+  );
 }
 
 @media (min-aspect-ratio: 16 / 9) and (max-height: 870px) {
   .pss-poster .pss-imageWrapper {
-    height: 35%;
+    height: 48%;
   }
 }

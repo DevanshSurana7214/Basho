@@ -36,7 +36,7 @@ const Footer = () => {
 
           {/* Links */}
           <div>
-            <h4 className="text-xs tracking-[0.2em] uppercase text-footer-muted mb-6">Explore</h4>
+            <h4 className="text-xs tracking-[0.2em] uppercase text-footer-text/90 font-medium mb-6">Explore</h4>
             <ul className="space-y-3">
               {[
                 { name: "Products", path: "/products" },
@@ -58,7 +58,7 @@ const Footer = () => {
           {/* Business & Visit */}
           <div className="space-y-8">
             <div>
-              <h4 className="text-xs tracking-[0.2em] uppercase text-footer-muted mb-4">Business</h4>
+              <h4 className="text-xs tracking-[0.2em] uppercase text-footer-text/90 font-medium mb-4">Business</h4>
               <Link 
                 to="/corporate" 
                 className="font-sans text-sm text-footer-text/70 hover:text-footer-text transition-colors duration-300"
@@ -67,7 +67,7 @@ const Footer = () => {
               </Link>
             </div>
             <div>
-              <h4 className="text-xs tracking-[0.2em] uppercase text-footer-muted mb-4">Visit</h4>
+              <h4 className="text-xs tracking-[0.2em] uppercase text-footer-text/90 font-medium mb-4">Visit</h4>
               <div className="space-y-2 font-sans text-sm text-footer-text/70">
                 <p>Piplod, Surat, Gujarat</p>
                 <p>Tue - Sun: 10am - 6pm</p>

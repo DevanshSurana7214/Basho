@@ -86,7 +86,7 @@ const TexturesGridSection = () => {
   return (
     <section 
       ref={sectionRef} 
-      className="snap-section py-40 md:py-56 bg-paper relative overflow-hidden"
+      className="snap-section py-16 md:py-24 bg-paper relative overflow-hidden"
     >
       {/* Grain overlay */}
       <div 

@@ -6,9 +6,7 @@ import Navigation from "@/components/Navigation";
 import ArrivalSection from "@/components/home/ArrivalSection";
 import { HeroScrollZoom } from "@/components/home/HeroScrollZoom";
 import { SmoothScrollProvider } from "@/components/home/SmoothScroll";
-
-import WabiSabiRevealSection from "@/components/home/WabiSabiRevealSection";
-
+import CulturalGroundingSection from "@/components/home/CulturalGroundingSection";
 import TexturesGridSection from "@/components/home/TexturesGridSection";
 import ProductsShowcaseSection from "@/components/home/ProductsShowcaseSection";
 import ExperiencesSection from "@/components/home/ExperiencesSection";
@@ -22,15 +20,15 @@ gsap.registerPlugin(ScrollTrigger);
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(() => {
-    return !sessionStorage.getItem("basho-loaded");
+    return !sessionStorage.getItem('basho-loaded');
   });
 
   useEffect(() => {
     if (!isLoading) return;
-
+    
     const timer = setTimeout(() => {
       setIsLoading(false);
-      sessionStorage.setItem("basho-loaded", "true");
+      sessionStorage.setItem('basho-loaded', 'true');
     }, 1200);
     return () => clearTimeout(timer);
   }, [isLoading]);
@@ -52,17 +50,12 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>
-          Basho by Shivangi | Japanese-Inspired Handcrafted Pottery & Tableware
-        </title>
-        <meta
-          name="description"
-          content="Discover handcrafted Japanese-inspired pottery and tableware by Basho. Explore our collection, join workshops, and experience the art of wabi-sabi in Surat, Gujarat."
+        <title>Basho by Shivangi | Japanese-Inspired Handcrafted Pottery & Tableware</title>
+        <meta 
+          name="description" 
+          content="Discover handcrafted Japanese-inspired pottery and tableware by Basho. Explore our collection, join workshops, and experience the art of wabi-sabi in Surat, Gujarat." 
         />
-        <meta
-          name="keywords"
-          content="pottery, handcrafted tableware, Japanese pottery, wabi-sabi, ceramic workshops, Surat pottery, Gujarat pottery"
-        />
+        <meta name="keywords" content="pottery, handcrafted tableware, Japanese pottery, wabi-sabi, ceramic workshops, Surat pottery, Gujarat pottery" />
       </Helmet>
 
       {/* Cinematic loading - minimal, calm */}
@@ -76,7 +69,7 @@ const Index = () => {
           >
             <div className="flex flex-col items-center">
               {/* Logo */}
-              <motion.img
+              <motion.img 
                 src={logoImage}
                 alt="Bashō"
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -91,11 +84,7 @@ const Index = () => {
                 <motion.div
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
-                  transition={{
-                    duration: 1,
-                    delay: 0.2,
-                    ease: [0.25, 0.1, 0.25, 1],
-                  }}
+                  transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
                   className="h-full bg-cream/40 origin-left"
                 />
               </div>
@@ -103,31 +92,31 @@ const Index = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
+      
       <SmoothScrollProvider>
         <div className="min-h-screen">
           <Navigation />
           <main>
             {/* Section 1: Arrival - First Impression */}
             <ArrivalSection />
-
+            
             {/* Section 1.5: Hero Scroll Zoom - Cinematic Image Sequence */}
             <HeroScrollZoom />
-
-            {/* Section 2: Wabi-Sabi Reveal */}
-            <WabiSabiRevealSection />
-
-            {/* Section 3: Textures & Materials - Sensory Grid */}
-            <TexturesGridSection />
-
-            {/* Section 5: Products as Outcome - Editorial Layout */}
-            <ProductsShowcaseSection />
-
-            {/* Section 6: Experiences & Workshops - Human Connection */}
-            <ExperiencesSection />
-
-            {/* Section 7: Trust & Social Proof - Testimonials, Studio */}
-            <TrustSection />
+            
+            {/* Section 2: Cultural Grounding - Philosophy */}
+            <CulturalGroundingSection />
+          
+          {/* Section 3: Textures & Materials - Sensory Grid */}
+          <TexturesGridSection />
+          
+          {/* Section 5: Products as Outcome - Editorial Layout */}
+          <ProductsShowcaseSection />
+          
+          {/* Section 6: Experiences & Workshops - Human Connection */}
+          <ExperiencesSection />
+          
+          {/* Section 7: Trust & Social Proof - Testimonials, Studio */}
+          <TrustSection />
           </main>
           <Footer />
           <ChatWidget />

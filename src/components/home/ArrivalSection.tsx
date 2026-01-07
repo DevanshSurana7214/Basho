@@ -16,8 +16,8 @@ const ArrivalSection = () => {
   }, [videoLoaded]);
 
   return (
-    <section 
-      ref={sectionRef} 
+    <section
+      ref={sectionRef}
       className="snap-section relative h-screen w-full overflow-hidden"
     >
       {/* Full-viewport video background */}
@@ -35,10 +35,10 @@ const ArrivalSection = () => {
         >
           <source src={HERO_VIDEO_URL} type="video/mp4" />
         </video>
-        
+
         {/* Cinematic dark overlay - deep charcoal/clay gradient */}
         {/* Center-focused with radial gradient for depth */}
-        <div 
+        <div
           className="absolute inset-0"
           style={{
             background: `
@@ -52,9 +52,9 @@ const ArrivalSection = () => {
             `
           }}
         />
-        
+
         {/* Top-to-bottom gradient for text readability at top */}
-        <div 
+        <div
           className="absolute inset-0"
           style={{
             background: `
@@ -70,7 +70,7 @@ const ArrivalSection = () => {
         />
 
         {/* Subtle vignette for cinematic depth */}
-        <div 
+        <div
           className="absolute inset-0"
           style={{
             background: `
@@ -85,7 +85,7 @@ const ArrivalSection = () => {
       </div>
 
       {/* Very subtle grain texture */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none opacity-[0.03]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
@@ -96,7 +96,7 @@ const ArrivalSection = () => {
       {/* Centered hero text - architectural, editorial */}
       <div className="absolute inset-0 flex flex-col items-center justify-center px-6 md:px-8">
         {/* Eyebrow text - subtle, spaced */}
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 1.8, ease: [0.25, 0.1, 0.25, 1] }}
@@ -106,7 +106,7 @@ const ArrivalSection = () => {
         </motion.p>
 
         {/* Main headline - large serif, architectural */}
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.4, delay: 2.1, ease: [0.25, 0.1, 0.25, 1] }}
@@ -121,7 +121,7 @@ const ArrivalSection = () => {
         </motion.h1>
 
         {/* Supporting line - understated */}
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 2.5, ease: [0.25, 0.1, 0.25, 1] }}
@@ -137,17 +137,17 @@ const ArrivalSection = () => {
           transition={{ duration: 1, delay: 3, ease: [0.25, 0.1, 0.25, 1] }}
           className="mt-12 md:mt-16"
         >
-          <a 
+          <a
             href="#collection"
             className="group inline-flex items-center gap-3 text-cream/60 hover:text-cream/90 transition-colors duration-500"
           >
             <span className="text-[10px] md:text-[11px] tracking-[0.35em] uppercase font-light">
               Explore Collection
             </span>
-            <svg 
-              className="w-4 h-4 transform group-hover:translate-y-1 transition-transform duration-500" 
-              fill="none" 
-              viewBox="0 0 24 24" 
+            <svg
+              className="w-4 h-4 transform group-hover:translate-y-1 transition-transform duration-500"
+              fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth={1}
             >
@@ -158,14 +158,14 @@ const ArrivalSection = () => {
       </div>
 
       {/* Minimal scroll indicator - bottom center */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 3.5, ease: [0.25, 0.1, 0.25, 1] }}
         className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2"
       >
         <div className="flex flex-col items-center gap-3">
-          <motion.div 
+          <motion.div
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             className="w-px h-10 bg-gradient-to-b from-cream/40 to-transparent"

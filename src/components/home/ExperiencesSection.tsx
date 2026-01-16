@@ -6,38 +6,45 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import beginnerWorkshop from "@/assets/workshops/beginner-pottery.jpg";
 import coupleWorkshop from "@/assets/workshops/couple-pottery-date.jpg";
+import CeramicDriftCanvasReverse from "./CeramicDriftCanvasReverse";
 
 const ExperiencesSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-15%" });
 
   const { data: workshops } = useQuery({
-    queryKey: ['featured-workshops-home'],
+    queryKey: ["featured-workshops-home"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('workshops')
-        .select('*')
-        .eq('is_active', true)
+        .from("workshops")
+        .select("*")
+        .eq("is_active", true)
         .limit(2);
-      
+
       if (error) throw error;
       return data;
-    }
+    },
   });
 
   const workshopImages = [beginnerWorkshop, coupleWorkshop];
 
   return (
-    <section ref={ref} className="py-16 md:py-24 bg-muted relative overflow-hidden">
+    <section
+      ref={ref}
+      className="py-16 md:py-24 bg-muted relative overflow-hidden"
+    >
+      {/* WebGL Background — Ceramic Drift (Reverse Direction) */}
+      <CeramicDriftCanvasReverse sectionRef={ref} />
+
       {/* Grain overlay */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none opacity-[0.02] mix-blend-overlay"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulance type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }}
       />
 
-      <div className="container px-8 md:px-12 lg:px-24">
+      <div className="container px-8 md:px-12 lg:px-24 relative z-10">
         {/* Section header - cinematic */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -52,7 +59,7 @@ const ExperiencesSection = () => {
             Experiences & Workshops
           </h2>
           <p className="font-sans text-muted-foreground/70 text-sm mt-8 max-w-md mx-auto leading-relaxed">
-            Learn the ancient art of pottery in our intimate studio space. 
+            Learn the ancient art of pottery in our intimate studio space.
             Connect with clay, with others, with yourself.
           </p>
         </motion.div>
@@ -60,7 +67,7 @@ const ExperiencesSection = () => {
         {/* Workshop cards - slow reveal */}
         <div className="grid md:grid-cols-2 gap-12 md:gap-16">
           {workshops?.map((workshop, index) => (
-            <WorkshopCard 
+            <WorkshopCard
               key={workshop.id}
               workshop={workshop}
               fallbackImage={workshopImages[index]}
@@ -77,7 +84,7 @@ const ExperiencesSection = () => {
           transition={{ duration: 1.2, delay: 1.2 }}
           className="mt-20 md:mt-28 text-center"
         >
-          <Link 
+          <Link
             to="/workshops"
             className="inline-flex items-center gap-4 text-foreground/70 text-sm tracking-[0.2em] uppercase font-sans hover:text-foreground transition-colors duration-700 group"
           >
@@ -94,7 +101,7 @@ const WorkshopCard = ({
   workshop,
   fallbackImage,
   index,
-  isInView
+  isInView,
 }: {
   workshop: any;
   fallbackImage: string;
@@ -104,7 +111,7 @@ const WorkshopCard = ({
   const cardRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: cardRef,
-    offset: ["start end", "end start"]
+    offset: ["start end", "end start"],
   });
 
   const imageY = useTransform(scrollYProgress, [0, 1], ["5%", "-5%"]);
@@ -114,10 +121,10 @@ const WorkshopCard = ({
       ref={cardRef}
       initial={{ opacity: 0, y: 60 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ 
-        duration: 1.2, 
-        delay: 0.4 + (index * 0.25),
-        ease: [0.25, 0.1, 0.25, 1]
+      transition={{
+        duration: 1.2,
+        delay: 0.4 + index * 0.25,
+        ease: [0.25, 0.1, 0.25, 1],
       }}
       className="group"
     >
@@ -136,7 +143,7 @@ const WorkshopCard = ({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 1, delay: 0.6 + (index * 0.2) }}
+        transition={{ duration: 1, delay: 0.6 + index * 0.2 }}
         className="space-y-4"
       >
         <h3 className="font-serif text-xl md:text-2xl text-foreground font-light">
@@ -145,7 +152,7 @@ const WorkshopCard = ({
         <p className="font-sans text-muted-foreground/70 text-sm leading-relaxed">
           {workshop.description}
         </p>
-        
+
         {workshop.duration && (
           <p className="text-xs text-muted-foreground/50 tracking-wide">
             {workshop.duration}

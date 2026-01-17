@@ -22,6 +22,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import ceramicModelUrl from "@/assets/base_basic_pbr.glb?url";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -79,7 +80,7 @@ const CeramicDriftCanvas = ({ sectionRef }: CeramicDriftCanvasProps) => {
       35, // Narrow FOV = less distortion = premium feel
       canvas.offsetWidth / canvas.offsetHeight,
       0.1,
-      100
+      100,
     );
     camera.position.set(0, 0, 18); // Pull back for elegance
     sceneRef.current.camera = camera;
@@ -121,7 +122,7 @@ const CeramicDriftCanvas = ({ sectionRef }: CeramicDriftCanvasProps) => {
     const loader = new GLTFLoader();
 
     loader.load(
-      "/src/assets/base_basic_pbr.glb",
+      ceramicModelUrl,
       (gltf) => {
         const model = gltf.scene;
 
@@ -185,7 +186,7 @@ const CeramicDriftCanvas = ({ sectionRef }: CeramicDriftCanvasProps) => {
             z: -1, // Subtle depth shift (parallax)
             ease: "none", // Linear for scroll sync
           },
-          0
+          0,
         );
 
         // Rotation: scroll-based continuous rotation on all axes
@@ -197,7 +198,7 @@ const CeramicDriftCanvas = ({ sectionRef }: CeramicDriftCanvasProps) => {
             z: THREE.MathUtils.degToRad(30), // Increased rolling motion
             ease: "none",
           },
-          0
+          0,
         );
 
         sceneRef.current.scrollTrigger = timeline.scrollTrigger;
@@ -205,7 +206,7 @@ const CeramicDriftCanvas = ({ sectionRef }: CeramicDriftCanvasProps) => {
       undefined,
       (error) => {
         console.error("Failed to load ceramic model:", error);
-      }
+      },
     );
 
     // ═══════════════════════════════════════════════════════════
@@ -221,7 +222,7 @@ const CeramicDriftCanvas = ({ sectionRef }: CeramicDriftCanvasProps) => {
       ) {
         sceneRef.current.renderer.render(
           sceneRef.current.scene,
-          sceneRef.current.camera
+          sceneRef.current.camera,
         );
       }
     };

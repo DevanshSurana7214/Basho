@@ -10,6 +10,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import ceramicModelUrl from "@/assets/base_basic_pbr.glb?url";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -66,7 +67,7 @@ const CeramicDriftCanvasReverse = ({
       35,
       canvas.offsetWidth / canvas.offsetHeight,
       0.1,
-      100
+      100,
     );
     camera.position.set(0, 0, 18);
     sceneRef.current.camera = camera;
@@ -103,7 +104,7 @@ const CeramicDriftCanvasReverse = ({
     const loader = new GLTFLoader();
 
     loader.load(
-      "/src/assets/base_basic_pbr.glb",
+      ceramicModelUrl,
       (gltf) => {
         const model = gltf.scene;
 
@@ -162,7 +163,7 @@ const CeramicDriftCanvasReverse = ({
             z: -1,
             ease: "none",
           },
-          0
+          0,
         );
 
         // Rotation: same 1.5 rotations
@@ -174,7 +175,7 @@ const CeramicDriftCanvasReverse = ({
             z: THREE.MathUtils.degToRad(30),
             ease: "none",
           },
-          0
+          0,
         );
 
         sceneRef.current.scrollTrigger = timeline.scrollTrigger;
@@ -182,7 +183,7 @@ const CeramicDriftCanvasReverse = ({
       undefined,
       (error) => {
         console.error("Failed to load ceramic model:", error);
-      }
+      },
     );
 
     // ═══════════════════════════════════════════════════════════
@@ -198,7 +199,7 @@ const CeramicDriftCanvasReverse = ({
       ) {
         sceneRef.current.renderer.render(
           sceneRef.current.scene,
-          sceneRef.current.camera
+          sceneRef.current.camera,
         );
       }
     };

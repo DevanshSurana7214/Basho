@@ -1,43 +1,88 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import {
+  MessageCircle,
+  X,
+  Send,
+  Loader2,
+  ShoppingBag,
+  Calendar,
+  Sparkles,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+
+type ProductLite = {
+  id: string;
+  name: string;
+  price: number;
+  category?: string;
+};
+
+type WorkshopLite = {
+  id: string;
+  title: string;
+  price: number;
+};
 
 interface Message {
   id: string;
   content: string;
   role: "user" | "assistant";
   timestamp: Date;
+  actions?: ChatAction[];
 }
 
-const N8N_WEBHOOK_URL = "https://rajdeeppa53.app.n8n.cloud/webhook/477df94d-8bcf-439e-a49d-b96ceb0a91a6/chat";
+interface ChatAction {
+  type: "add_to_cart" | "book_workshop" | "book_experience" | "view_product";
+  label: string;
+  data: {
+    id?: string;
+    name?: string;
+    price?: number;
+    type?: "product" | "workshop" | "experience";
+  };
+}
+
+const N8N_WEBHOOK_URL =
+  "https://rajdeeppa54.app.n8n.cloud/webhook/477df94d-8bcf-439e-a49d-b96ceb0a91a6/chat";
 
 const formatMarkdown = (text: string): string => {
-  return text
-    // Bold: **text**
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    // Italic: *text* (but not inside bold)
-    .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
-    // Inline code: `code`
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    // Bullet lists: lines starting with - or *
-    .replace(/^[\-\*]\s+(.+)$/gm, '<li>$1</li>')
-    // Wrap consecutive <li> in <ul>
-    .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
-    // Line breaks
-    .replace(/\n/g, '<br />');
+  return (
+    text
+      // Bold: **text**
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      // Italic: *text* (but not inside bold)
+      .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, "<em>$1</em>")
+      // Inline code: `code`
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      // Bullet lists: lines starting with - or *
+      .replace(/^[\-\*]\s+(.+)$/gm, "<li>$1</li>")
+      // Wrap consecutive <li> in <ul>
+      .replace(/(<li>.*<\/li>\n?)+/g, "<ul>$&</ul>")
+      // Line breaks
+      .replace(/\n/g, "<br />")
+  );
 };
 
 const ChatWidget = () => {
   const [sessionId] = useState(() => crypto.randomUUID());
+  const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [hasPlayedIntroAnimation, setHasPlayedIntroAnimation] = useState(false);
   const [triggerBounce, setTriggerBounce] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: "Hello! I'm here to help you learn about our handcrafted pottery and workshops. How can I assist you today?",
+      content:
+        "Hello! I'm here to help you explore our handcrafted pottery, book workshops, and reserve experiences. How can I assist you today?",
       role: "assistant",
       timestamp: new Date(),
     },
@@ -67,6 +112,358 @@ const ChatWidget = () => {
     scrollToBottom();
   }, [messages]);
 
+  const normalize = (value: string) => value.toLowerCase().trim();
+
+  const categoryFromQuery = (query: string): string | null => {
+    const q = normalize(query);
+
+    const categoryMap: Array<{ match: RegExp; category: string }> = [
+      { match: /\bmug(s)?\b/, category: "Mugs" },
+      { match: /\bbowl(s)?\b/, category: "Bowls" },
+      { match: /\bplate(s)?\b/, category: "Plates" },
+      { match: /\bplatter(s)?\b/, category: "Platters" },
+      { match: /\btea\s*set(s)?\b|\bteaset(s)?\b/, category: "Tea Sets" },
+      { match: /\bstorage\b|\bjar(s)?\b/, category: "Storage" },
+      { match: /\bsculpture(s)?\b/, category: "Sculptures" },
+      { match: /\bplanter(s)?\b/, category: "Planters" },
+    ];
+
+    for (const item of categoryMap) {
+      if (item.match.test(q)) return item.category;
+    }
+    return null;
+  };
+
+  const looksLikeProductQuery = (query: string): boolean => {
+    const q = normalize(query);
+    return (
+      /\b(show|browse|see|view|buy|order|shop|price|available)\b/.test(q) &&
+      /(mug|bowl|plate|platter|tea\s*set|pottery|sculpture|planter|product|collection)/.test(q)
+    );
+  };
+
+  const looksLikeWorkshopQuery = (query: string): boolean => {
+    const q = normalize(query);
+    return /\b(workshop|class|session|wheel\s*throwing|beginner|kids)\b/.test(q);
+  };
+
+  const looksLikeExperienceQuery = (query: string): boolean => {
+    const q = normalize(query);
+    return /\b(experience|studio\s*visit|pottery\s*date|birthday|celebration|private\s*session)\b/.test(q);
+  };
+
+  const looksLikeCustomOrderQuery = (query: string): boolean => {
+    const q = normalize(query);
+    return /\b(custom\s*order|custom\s*made|personalized|bespoke)\b/.test(q);
+  };
+
+  const pushAssistantMessage = (content: string, actions?: ChatAction[]) => {
+    const botMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      content,
+      role: "assistant",
+      timestamp: new Date(),
+      actions: actions && actions.length > 0 ? actions : undefined,
+    };
+    setMessages((prev) => [...prev, botMessage]);
+  };
+
+  const handleCommerceIntent = async (userText: string): Promise<boolean> => {
+    // Custom Orders
+    if (looksLikeCustomOrderQuery(userText)) {
+      pushAssistantMessage(
+        "Sure — I can help with a custom order. Please open the custom order form and share your requirements (size, style, timeline, reference images).",
+        [
+          {
+            type: "view_product",
+            label: "Open Custom Order Form",
+            data: { id: "custom", type: "product" },
+          },
+        ]
+      );
+      return true;
+    }
+
+    // Experiences
+    if (looksLikeExperienceQuery(userText)) {
+      pushAssistantMessage(
+        "Yes! We offer studio experiences (couple pottery dates, celebrations, private sessions). Tap below to view and book.",
+        [
+          {
+            type: "book_experience",
+            label: "View Experiences",
+            data: { id: "experiences" },
+          },
+        ]
+      );
+      return true;
+    }
+
+    // Workshops
+    if (looksLikeWorkshopQuery(userText)) {
+      const { data: workshops, error } = await supabase
+        .from("workshops")
+        .select("id, title, price")
+        .eq("is_active", true)
+        .limit(5);
+
+      if (error) {
+        console.error("Workshop fetch error:", error);
+        pushAssistantMessage(
+          "I can help you book a workshop, but I couldn't load the workshop list right now. Please try again or open the Workshops page.",
+          [
+            {
+              type: "book_workshop",
+              label: "Open Workshops",
+              data: { id: "workshops", type: "workshop" },
+            },
+          ]
+        );
+        return true;
+      }
+
+      const workshopActions: ChatAction[] = (workshops as WorkshopLite[] | null | undefined)
+        ? (workshops as WorkshopLite[]).slice(0, 3).map((w) => ({
+            type: "book_workshop",
+            label: `Book ${w.title} - ₹${w.price}`,
+            data: { id: w.id, name: w.title, price: w.price, type: "workshop" },
+          }))
+        : [];
+
+      pushAssistantMessage(
+        workshops && workshops.length > 0
+          ? "Here are a few workshops you can book right now:"
+          : "We currently don’t have workshops listed as active. Please check back soon or open the Workshops page.",
+        workshopActions.length
+          ? workshopActions
+          : [
+              {
+                type: "book_workshop",
+                label: "Open Workshops",
+                data: { id: "workshops", type: "workshop" },
+              },
+            ]
+      );
+
+      return true;
+    }
+
+    // Products
+    if (looksLikeProductQuery(userText)) {
+      const category = categoryFromQuery(userText);
+
+      let query = supabase.from("products").select("id, name, price, category");
+      if (category) query = query.eq("category", category);
+
+      const { data: products, error } = await query.limit(6);
+
+      if (error) {
+        console.error("Product fetch error:", error);
+        pushAssistantMessage(
+          "I can help you shop, but I couldn't load products right now. Please open the Products page and try again.",
+          [
+            { type: "view_product", label: "Open Products", data: { id: "", type: "product" } },
+          ]
+        );
+        return true;
+      }
+
+      const list = (products as ProductLite[] | null | undefined) || [];
+      const productActions: ChatAction[] = list.slice(0, 3).map((p) => ({
+        type: "add_to_cart",
+        label: `Add ${p.name} - ₹${p.price}`,
+        data: { id: p.id, name: p.name, price: p.price, type: "product" },
+      }));
+
+      const heading = category
+        ? `Here are some ${category.toLowerCase()} you can add to cart:`
+        : "Here are some products you can add to cart:";
+
+      pushAssistantMessage(
+        list.length ? heading : "I couldn’t find matching products right now. Please open the Products page to browse.",
+        list.length
+          ? productActions
+          : [{ type: "view_product", label: "Open Products", data: { id: "", type: "product" } }]
+      );
+
+      return true;
+    }
+
+    return false;
+  };
+
+  // Handle action buttons (Add to Cart, Book Workshop, etc.)
+  const handleAction = async (action: ChatAction) => {
+    switch (action.type) {
+      case "add_to_cart":
+        if (action.data.id && action.data.type === "product") {
+          const { data: product } = await supabase
+            .from("products")
+            .select("id, name, price, image_url, weight_kg")
+            .eq("id", action.data.id)
+            .single();
+
+          if (product) {
+            await addToCart({
+              productId: product.id,
+              itemType: "product",
+              product: product,
+            });
+            toast.success("Added to cart");
+          }
+        }
+        break;
+
+      case "book_workshop":
+        if (action.data.id) {
+          const { data: workshop } = await supabase
+            .from("workshops")
+            .select("id, title, price, image_url, duration")
+            .eq("id", action.data.id)
+            .single();
+
+          if (workshop) {
+            await addToCart({
+              workshopId: workshop.id,
+              itemType: "workshop",
+              workshop: workshop,
+            });
+            toast.success("Workshop added to cart");
+          }
+        }
+        break;
+
+      case "book_experience":
+        if (!user) {
+          toast.error("Please sign in to book an experience");
+          navigate("/auth?redirect=/experiences");
+          setIsOpen(false);
+          break;
+        }
+        navigate("/experiences");
+        setIsOpen(false);
+        break;
+
+      case "view_product":
+        if (action.data.id === "custom") {
+          navigate("/products/custom");
+          setIsOpen(false);
+          break;
+        }
+        if (!action.data.id) {
+          navigate("/products");
+          setIsOpen(false);
+          break;
+        }
+        navigate(`/products/${action.data.id}`);
+        setIsOpen(false);
+        break;
+    }
+  };
+
+  // Parse AI response for actionable items
+  const parseActionsFromResponse = async (
+    responseText: string,
+  ): Promise<ChatAction[]> => {
+    const actions: ChatAction[] = [];
+
+    // Check if response mentions products
+    const productKeywords = [
+      "mug",
+      "bowl",
+      "plate",
+      "vase",
+      "platter",
+      "tea set",
+      "pottery",
+      "sculpture",
+    ];
+    const hasProductMention = productKeywords.some((keyword) =>
+      responseText.toLowerCase().includes(keyword),
+    );
+
+    if (hasProductMention) {
+      // Fetch products matching keywords
+      const { data: products } = await supabase
+        .from("products")
+        .select("id, name, price")
+        .limit(3);
+
+      products?.forEach((product) => {
+        if (
+          responseText
+            .toLowerCase()
+            .includes(product.name.toLowerCase().split(" ")[0])
+        ) {
+          actions.push({
+            type: "add_to_cart",
+            label: `Add ${product.name} - ₹${product.price}`,
+            data: {
+              id: product.id,
+              name: product.name,
+              price: product.price,
+              type: "product",
+            },
+          });
+        }
+      });
+    }
+
+    // Check if response mentions workshops
+    const workshopKeywords = [
+      "workshop",
+      "class",
+      "pottery session",
+      "wheel throwing",
+      "beginner",
+    ];
+    const hasWorkshopMention = workshopKeywords.some((keyword) =>
+      responseText.toLowerCase().includes(keyword),
+    );
+
+    if (hasWorkshopMention) {
+      const { data: workshops } = await supabase
+        .from("workshops")
+        .select("id, title, price")
+        .eq("is_active", true)
+        .limit(3);
+
+      workshops?.forEach((workshop) => {
+        actions.push({
+          type: "book_workshop",
+          label: `Book ${workshop.title} - ₹${workshop.price}`,
+          data: {
+            id: workshop.id,
+            name: workshop.title,
+            price: workshop.price,
+            type: "workshop",
+          },
+        });
+      });
+    }
+
+    // Check if response mentions experiences
+    const experienceKeywords = [
+      "experience",
+      "studio visit",
+      "pottery date",
+      "private session",
+    ];
+    const hasExperienceMention = experienceKeywords.some((keyword) =>
+      responseText.toLowerCase().includes(keyword),
+    );
+
+    if (hasExperienceMention) {
+      actions.push({
+        type: "book_experience",
+        label: "View Experiences",
+        data: { id: "studio-visit" },
+      });
+    }
+
+    return actions;
+  };
+
   const sendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -80,6 +477,18 @@ const ChatWidget = () => {
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
+
+    // First try to handle commerce intents locally (so it works even if AI is brand-only)
+    try {
+      const handled = await handleCommerceIntent(userMessage.content);
+      if (handled) {
+        setIsLoading(false);
+        return;
+      }
+    } catch (e) {
+      console.error("Intent handling error:", e);
+      // fall through to n8n
+    }
 
     try {
       const response = await fetch(N8N_WEBHOOK_URL, {
@@ -99,12 +508,21 @@ const ChatWidget = () => {
       }
 
       const data = await response.json();
-      
+      const responseText =
+        data.output ||
+        data.response ||
+        data.message ||
+        "I apologize, I couldn't process that request. Please try again.";
+
+      // Parse actions from the response
+      const actions = await parseActionsFromResponse(responseText);
+
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.output || data.response || data.message || "I apologize, I couldn't process that request. Please try again.",
+        content: responseText,
         role: "assistant",
         timestamp: new Date(),
+        actions: actions.length > 0 ? actions : undefined,
       };
 
       setMessages((prev) => [...prev, botMessage]);
@@ -112,7 +530,8 @@ const ChatWidget = () => {
       console.error("Chat error:", error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "I'm having trouble connecting right now. Please try again in a moment.",
+        content:
+          "I'm having trouble connecting right now. Please try again in a moment.",
         role: "assistant",
         timestamp: new Date(),
       };
@@ -196,8 +615,12 @@ const ChatWidget = () => {
                   <MessageCircle className="w-5 h-5 text-terracotta" />
                 </div>
                 <div>
-                  <h3 className="font-serif text-xl tracking-wide">Bashō Assistant</h3>
-                  <p className="text-xs text-cream/60 font-light">Ask about pottery & workshops</p>
+                  <h3 className="font-serif text-xl tracking-wide">
+                    Bashō Assistant
+                  </h3>
+                  <p className="text-xs text-cream/60 font-light">
+                    Ask about pottery & workshops
+                  </p>
                 </div>
               </div>
               <button
@@ -210,7 +633,7 @@ const ChatWidget = () => {
             </div>
 
             {/* Messages */}
-            <div 
+            <div
               className="flex-1 min-h-0 overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-cream/50 to-sand/20 overscroll-contain"
               data-lenis-prevent
               data-lenis-prevent-wheel
@@ -222,7 +645,7 @@ const ChatWidget = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                  className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"}`}
                 >
                   <div
                     className={`max-w-[85%] px-5 py-3 shadow-soft ${
@@ -231,13 +654,40 @@ const ChatWidget = () => {
                         : "bg-white/90 text-charcoal rounded-2xl rounded-bl-sm border border-sand/30"
                     }`}
                   >
-                    <div 
+                    <div
                       className="text-sm leading-relaxed [&_strong]:font-semibold [&_em]:italic [&_code]:bg-charcoal/10 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:my-2 [&_li]:my-1"
                       dangerouslySetInnerHTML={{
-                        __html: formatMarkdown(message.content)
+                        __html: formatMarkdown(message.content),
                       }}
                     />
                   </div>
+
+                  {/* Action Buttons */}
+                  {message.actions && message.actions.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2 max-w-[85%]">
+                      {message.actions.map((action, index) => (
+                        <motion.button
+                          key={index}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.1 * index }}
+                          onClick={() => handleAction(action)}
+                          className="flex items-center gap-2 px-3 py-2 bg-gradient-to-br from-terracotta to-terracotta/90 text-cream text-xs rounded-lg shadow-warm hover:shadow-xl hover:from-terracotta/90 hover:to-terracotta/80 transition-all duration-200"
+                        >
+                          {action.type === "add_to_cart" && (
+                            <ShoppingBag className="w-3 h-3" />
+                          )}
+                          {action.type === "book_workshop" && (
+                            <Calendar className="w-3 h-3" />
+                          )}
+                          {action.type === "book_experience" && (
+                            <Sparkles className="w-3 h-3" />
+                          )}
+                          <span>{action.label}</span>
+                        </motion.button>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               ))}
               {isLoading && (
@@ -251,17 +701,29 @@ const ChatWidget = () => {
                       <motion.span
                         className="w-2 h-2 bg-terracotta rounded-full"
                         animate={{ y: [0, -6, 0] }}
-                        transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                        transition={{
+                          duration: 0.6,
+                          repeat: Infinity,
+                          delay: 0,
+                        }}
                       />
                       <motion.span
                         className="w-2 h-2 bg-terracotta rounded-full"
                         animate={{ y: [0, -6, 0] }}
-                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.15 }}
+                        transition={{
+                          duration: 0.6,
+                          repeat: Infinity,
+                          delay: 0.15,
+                        }}
                       />
                       <motion.span
                         className="w-2 h-2 bg-terracotta rounded-full"
                         animate={{ y: [0, -6, 0] }}
-                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.3 }}
+                        transition={{
+                          duration: 0.6,
+                          repeat: Infinity,
+                          delay: 0.3,
+                        }}
                       />
                     </div>
                   </div>
@@ -290,7 +752,9 @@ const ChatWidget = () => {
                   <Send className="w-5 h-5" />
                 </Button>
               </div>
-              <p className="text-xs text-charcoal/40 text-center mt-3 font-light">Powered by Bashō AI</p>
+              <p className="text-xs text-charcoal/40 text-center mt-3 font-light">
+                Powered by Bashō AI
+              </p>
             </div>
           </motion.div>
         )}

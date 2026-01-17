@@ -138,18 +138,24 @@ const ChatWidget = () => {
     const q = normalize(query);
     return (
       /\b(show|browse|see|view|buy|order|shop|price|available)\b/.test(q) &&
-      /(mug|bowl|plate|platter|tea\s*set|pottery|sculpture|planter|product|collection)/.test(q)
+      /(mug|bowl|plate|platter|tea\s*set|pottery|sculpture|planter|product|collection)/.test(
+        q,
+      )
     );
   };
 
   const looksLikeWorkshopQuery = (query: string): boolean => {
     const q = normalize(query);
-    return /\b(workshop|class|session|wheel\s*throwing|beginner|kids)\b/.test(q);
+    return /\b(workshop|class|session|wheel\s*throwing|beginner|kids)\b/.test(
+      q,
+    );
   };
 
   const looksLikeExperienceQuery = (query: string): boolean => {
     const q = normalize(query);
-    return /\b(experience|studio\s*visit|pottery\s*date|birthday|celebration|private\s*session)\b/.test(q);
+    return /\b(experience|studio\s*visit|pottery\s*date|birthday|celebration|private\s*session)\b/.test(
+      q,
+    );
   };
 
   const looksLikeCustomOrderQuery = (query: string): boolean => {
@@ -179,7 +185,7 @@ const ChatWidget = () => {
             label: "Open Custom Order Form",
             data: { id: "custom", type: "product" },
           },
-        ]
+        ],
       );
       return true;
     }
@@ -194,7 +200,7 @@ const ChatWidget = () => {
             label: "View Experiences",
             data: { id: "experiences" },
           },
-        ]
+        ],
       );
       return true;
     }
@@ -217,12 +223,15 @@ const ChatWidget = () => {
               label: "Open Workshops",
               data: { id: "workshops", type: "workshop" },
             },
-          ]
+          ],
         );
         return true;
       }
 
-      const workshopActions: ChatAction[] = (workshops as WorkshopLite[] | null | undefined)
+      const workshopActions: ChatAction[] = (workshops as
+        | WorkshopLite[]
+        | null
+        | undefined)
         ? (workshops as WorkshopLite[]).slice(0, 3).map((w) => ({
             type: "book_workshop",
             label: `Book ${w.title} - ₹${w.price}`,
@@ -242,7 +251,7 @@ const ChatWidget = () => {
                 label: "Open Workshops",
                 data: { id: "workshops", type: "workshop" },
               },
-            ]
+            ],
       );
 
       return true;
@@ -262,8 +271,12 @@ const ChatWidget = () => {
         pushAssistantMessage(
           "I can help you shop, but I couldn't load products right now. Please open the Products page and try again.",
           [
-            { type: "view_product", label: "Open Products", data: { id: "", type: "product" } },
-          ]
+            {
+              type: "view_product",
+              label: "Open Products",
+              data: { id: "", type: "product" },
+            },
+          ],
         );
         return true;
       }
@@ -280,10 +293,18 @@ const ChatWidget = () => {
         : "Here are some products you can add to cart:";
 
       pushAssistantMessage(
-        list.length ? heading : "I couldn’t find matching products right now. Please open the Products page to browse.",
+        list.length
+          ? heading
+          : "I couldn’t find matching products right now. Please open the Products page to browse.",
         list.length
           ? productActions
-          : [{ type: "view_product", label: "Open Products", data: { id: "", type: "product" } }]
+          : [
+              {
+                type: "view_product",
+                label: "Open Products",
+                data: { id: "", type: "product" },
+              },
+            ],
       );
 
       return true;
